@@ -1,22 +1,1696 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visianary — Film Crew Marketplace</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #F1F6F7; }
-      input:focus, textarea:focus { outline: none; border-color: #F25C05 !important; box-shadow: 0 0 0 3px rgba(242,92,5,0.1); }
-      button:focus { outline: none; }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visianary — Producer Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0A0E12;
+  --surface: #F1F6F7;
+  --card: #FFFFFF;
+  --orange: #F25C05;
+  --teal: #009A84;
+  --yellow: #F1BD00;
+  --red: #E24B4A;
+  --blue: #05A2D7;
+  --muted: #8A9BAE;
+  --text: #0A0E12;
+  --border: rgba(10,14,18,0.09);
+  --sidebar-w: 220px;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px 24px 48px;
+}
+
+/* ── Screen Navigator ── */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.nav-bar-label {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 18px;
+  color: var(--orange);
+  letter-spacing: 2px;
+  margin-right: 12px;
+}
+.nav-btn {
+  padding: 8px 16px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.nav-btn:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+.nav-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+/* ── Screen Wrapper ── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── Desktop Shell ── */
+.desktop {
+  width: 100%;
+  max-width: 1440px;
+  min-height: 820px;
+  background: var(--surface);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Sidebar ── */
+.shell { display: flex; flex: 1; min-height: 0; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: #fff;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-text {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 26px;
+  color: var(--orange);
+  letter-spacing: 3px;
+}
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 4px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.nav-link:hover { background: rgba(10,14,18,0.04); color: var(--text); }
+.nav-link.active { background: rgba(242,92,5,0.08); color: var(--orange); }
+.nav-link .ico { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.avatar-sm {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.user-name { font-size: 12px; font-weight: 700; }
+.user-role { font-size: 11px; color: var(--muted); }
+
+/* ── Main Content Area ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: auto; }
+
+/* ── Top Header ── */
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+.header-left h1 { font-size: 22px; font-weight: 800; }
+.header-left .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.bell-btn {
+  position: relative;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 17px;
+}
+.bell-badge {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+.avatar-lg {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #fff;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { background: #d94f04; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+.btn-danger { background: transparent; border: 1.5px solid var(--red); color: var(--red); }
+
+/* ── Content Padding ── */
+.content { padding: 28px 32px; flex: 1; }
+
+/* ── Stats Row ── */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 800; }
+.stat-value.orange { color: var(--orange); }
+.stat-value.teal { color: var(--teal); }
+.stat-value.yellow { color: var(--yellow); }
+.stat-value.red { color: var(--red); }
+
+/* ── Section Header ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-title { font-size: 15px; font-weight: 800; }
+.view-all { font-size: 12px; color: var(--muted); font-weight: 600; cursor: pointer; }
+.view-all:hover { color: var(--orange); }
+
+/* ── Production Cards ── */
+.prod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.prod-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.prod-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.prod-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.prod-dates { font-size: 12px; color: var(--muted); }
+.status-chip {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.chip-active { background: rgba(0,154,132,0.1); color: var(--teal); }
+.chip-upcoming { background: rgba(5,162,215,0.1); color: var(--blue); }
+.chip-draft { background: rgba(138,155,174,0.12); color: var(--muted); }
+.crew-bar-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--muted); font-weight: 600;
+  margin-bottom: 6px;
+}
+.crew-bar-track {
+  height: 6px;
+  background: var(--surface);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  display: flex;
+}
+.bar-seg { height: 100%; }
+.bar-confirmed { background: var(--teal); }
+.bar-pending { background: var(--yellow); }
+.bar-rejected { background: var(--red); }
+.crew-counts { display: flex; gap: 16px; }
+.crew-count-item { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Two-col layout ── */
+.two-col { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+.two-col-wide { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+
+/* ── Forms ── */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 700; color: var(--text); }
+.form-input, .form-select, .form-textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--orange); }
+.form-textarea { min-height: 90px; resize: vertical; }
+.form-actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+/* ── Summary card ── */
+.summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+}
+.summary-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 16px; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+.summary-key { color: var(--muted); }
+.summary-val { font-weight: 700; }
+.summary-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--muted); font-weight: 600;
+  margin-bottom: 20px;
+}
+.breadcrumb span { color: var(--text); }
+.breadcrumb .sep { color: var(--border); }
+
+/* ── Step Indicator ── */
+.steps {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 28px;
+}
+.step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px;
+  font-size: 13px; font-weight: 700;
+}
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+  background: var(--surface);
+  color: var(--muted);
+  border: 2px solid var(--border);
+}
+.step.active .step-num { background: var(--orange); color: #fff; border-color: var(--orange); }
+.step.active { color: var(--text); }
+.step.done .step-num { background: var(--teal); color: #fff; border-color: var(--teal); }
+.step.done { color: var(--muted); }
+.step-line { height: 2px; background: var(--border); flex: 1; }
+.step.done + .step-line { background: var(--teal); }
+
+/* ── Drop Zone ── */
+.dropzone {
+  border: 2px dashed rgba(10,14,18,0.15);
+  border-radius: 16px;
+  padding: 56px 40px;
+  text-align: center;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+}
+.dropzone:hover { border-color: var(--orange); background: rgba(242,92,5,0.02); }
+.dropzone-icon { font-size: 44px; margin-bottom: 16px; }
+.dropzone h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+.dropzone p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+.upload-success {
+  background: rgba(0,154,132,0.06);
+  border: 1.5px solid rgba(0,154,132,0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px;
+}
+.upload-icon { font-size: 24px; }
+.upload-info h4 { font-size: 14px; font-weight: 800; color: var(--teal); margin-bottom: 2px; }
+.upload-info p { font-size: 12px; color: var(--muted); }
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.preview-table th {
+  text-align: left;
+  padding: 8px 12px;
+  background: var(--surface);
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.preview-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+.preview-table tr:last-child td { border-bottom: none; }
+
+/* ── Crew List ── */
+.crew-filters {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.dept-tabs { display: flex; gap: 4px; }
+.dept-tab {
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 11px; font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.dept-tab.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+.dept-section { margin-bottom: 20px; }
+.dept-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-radius: 8px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.dept-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.dept-count { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+.crew-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.15s;
+}
+.crew-row:hover { border-color: rgba(10,14,18,0.15); }
+.crew-row.selected { border-color: var(--orange); background: rgba(242,92,5,0.03); }
+.crew-checkbox {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.crew-row.selected .crew-checkbox { background: var(--orange); border-color: var(--orange); color: #fff; font-size: 11px; }
+.crew-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.crew-info { flex: 1; }
+.crew-name { font-size: 13px; font-weight: 700; }
+.crew-role { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.crew-rate { font-size: 13px; font-weight: 700; color: var(--text); }
+.works-badge {
+  padding: 3px 8px;
+  background: var(--surface);
+  border-radius: 100px;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+}
+.works-badge.has-worked { background: rgba(0,154,132,0.08); color: var(--teal); }
+
+/* ── Sticky Bottom Bar ── */
+.sticky-bar {
+  position: sticky; bottom: 0;
+  background: var(--bg);
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.selected-preview { display: flex; align-items: center; gap: 12px; }
+.selected-chips { display: flex; gap: 6px; }
+.selected-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 100px;
+  font-size: 11px; font-weight: 700; color: #fff;
+}
+.selected-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+/* ── Notification Panel ── */
+.notif-panel {
+  width: 360px;
+  background: var(--card);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+}
+.notif-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.notif-title { font-size: 14px; font-weight: 800; }
+.notif-badge {
+  padding: 2px 8px;
+  background: var(--red);
+  border-radius: 100px;
+  font-size: 10px; font-weight: 800; color: #fff;
+}
+.notif-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 12px;
+}
+.notif-item.unread { background: rgba(242,92,5,0.02); }
+.notif-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.notif-body { flex: 1; }
+.notif-text { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.notif-meta { font-size: 11px; color: var(--muted); }
+.notif-status { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.notif-cta { padding: 20px; margin-top: auto; border-top: 1px solid var(--border); }
+
+/* ── Crew Response List (Screen 6) ── */
+.response-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.badge-confirmed { background: rgba(0,154,132,0.1); color: var(--teal); }
+.badge-pending { background: rgba(241,189,0,0.12); color: #B38D00; }
+.badge-rejected { background: rgba(226,75,74,0.1); color: var(--red); }
+.response-info { flex: 1; }
+.response-name { font-size: 15px; font-weight: 800; }
+.response-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.response-time { font-size: 11px; color: var(--muted); }
+.response-rate { font-size: 14px; font-weight: 700; margin-right: 8px; }
+.response-actions { display: flex; gap: 8px; }
+
+.assembly-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.assembly-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+.assembly-track {
+  height: 8px; background: var(--surface);
+  border-radius: 100px; overflow: hidden;
+}
+.assembly-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--teal), var(--blue));
+  width: 33%;
+  transition: width 0.5s;
+}
+
+/* ── Info note ── */
+.info-note {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+.info-note h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+.info-table { width: 100%; font-size: 11px; }
+.info-table th { text-align: left; color: var(--muted); padding: 4px 8px; font-weight: 700; }
+.info-table td { padding: 4px 8px; font-weight: 500; }
+
+/* Department colors */
+.dept-camera { background: #4B6EFF; }
+.dept-lighting { background: #F59E0B; }
+.dept-grip { background: #8B5CF6; }
+.dept-sound { background: #10B981; }
+.dept-production { background: #EF4444; }
+
+/* ── Mini Calendar ── */
+.mini-cal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-month { font-size: 14px; font-weight: 800; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.cal-day-name { font-size: 10px; font-weight: 700; color: var(--muted); padding: 4px; }
+.cal-day {
+  font-size: 11px; font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.cal-day:hover { background: var(--surface); }
+.cal-day.today { background: var(--orange); color: #fff; }
+.cal-day.has-event { color: var(--teal); font-weight: 800; }
+.cal-day.muted { color: var(--border); }
+
+/* ── Upcoming sidebar widget ── */
+.event-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.event-item:last-child { border-bottom: none; }
+.event-dot-col { display: flex; flex-direction: column; align-items: center; gap: 0; padding-top: 4px; }
+.event-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.event-info h5 { font-size: 13px; font-weight: 700; }
+.event-info p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(10,14,18,0.15); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── Screen Navigator ── -->
+<div class="nav-bar">
+  <div class="nav-bar-label">VISIANARY</div>
+  <button class="nav-btn active" onclick="showScreen(0, this)">1 · Landing Dashboard</button>
+  <button class="nav-btn" onclick="showScreen(1, this)">2 · New Production</button>
+  <button class="nav-btn" onclick="showScreen(2, this)">3 · Upload Excel</button>
+  <button class="nav-btn" onclick="showScreen(3, this)">4 · Select Crew</button>
+  <button class="nav-btn" onclick="showScreen(4, this)">5 · Notification</button>
+  <button class="nav-btn" onclick="showScreen(5, this)">6 · Crew Responses</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 1 — PRODUCER LANDING DASHBOARD
+     ════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-0">
+<div class="desktop">
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">VISIANARY</div></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <div class="nav-link active"><span class="ico">⊞</span> Dashboard</div>
+        <div class="nav-link"><span class="ico">🎬</span> Productions</div>
+        <div class="nav-link"><span class="ico">📷</span> Shoots</div>
+        <div class="nav-link"><span class="ico">👥</span> Crew</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Manage</div>
+        <div class="nav-link"><span class="ico">📋</span> Call Sheets</div>
+        <div class="nav-link"><span class="ico">💰</span> Finances</div>
+        <div class="nav-link"><span class="ico">📊</span> Performance</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="avatar-sm">KH</div>
+          <div>
+            <div class="user-name">Kate Huezo</div>
+            <div class="user-role">Producer</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="top-header">
+        <div class="header-left">
+          <h1>Good morning, Kate 👋</h1>
+          <div class="sub">Saturday, April 19, 2026</div>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-orange" onclick="showScreen(1, document.querySelectorAll('.nav-btn')[1])">+ New Production</button>
+          <div class="bell-btn">🔔</div>
+          <div class="avatar-lg">KH</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Total Crew Contacted</div>
+            <div class="stat-value orange">57</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Confirmed</div>
+            <div class="stat-value teal">42</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value yellow">12</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Rejected</div>
+            <div class="stat-value red">3</div>
+          </div>
+        </div>
+
+        <div class="two-col-wide">
+          <div>
+            <!-- Productions -->
+            <div class="section-header">
+              <div class="section-title">Upcoming Productions</div>
+              <div class="view-all">View all →</div>
+            </div>
+            <div class="prod-grid" style="grid-template-columns: 1fr;">
+              <!-- Card 1 -->
+              <div class="prod-card">
+                <div class="prod-card-header">
+                  <div>
+                    <div class="prod-name">Dandelion Shoot</div>
+                    <div class="prod-dates">Mon, Mar 23 — Fri, Mar 27</div>
+                  </div>
+                  <div class="status-chip chip-active">ACTIVE</div>
+                </div>
+                <div class="crew-bar-label">
+                  <span>Crew Assembly</span>
+                  <span>42 / 57</span>
+                </div>
+                <div class="crew-bar-track">
+                  <div class="bar-seg bar-confirmed" style="width:73%"></div>
+                  <div class="bar-seg bar-pending" style="width:21%"></div>
+                  <div class="bar-seg bar-rejected" style="width:6%"></div>
+                </div>
+                <div class="crew-counts">
+                  <div class="crew-count-item"><div class="dot" style="background:var(--teal)"></div>42 Confirmed</div>
+                  <div class="crew-count-item"><div class="dot" style="background:var(--yellow)"></div>12 Pending</div>
+                  <div class="crew-count-item"><div class="dot" style="background:var(--red)"></div>3 Rejected</div>
+                </div>
+              </div>
+              <!-- Card 2 -->
+              <div class="prod-card">
+                <div class="prod-card-header">
+                  <div>
+                    <div class="prod-name">Midnight Reel</div>
+                    <div class="prod-dates">Sun, Apr 5 — Thu, Apr 9</div>
+                  </div>
+                  <div class="status-chip chip-upcoming">UPCOMING</div>
+                </div>
+                <div class="crew-bar-label">
+                  <span>Crew Assembly</span>
+                  <span>18 / 40</span>
+                </div>
+                <div class="crew-bar-track">
+                  <div class="bar-seg bar-confirmed" style="width:45%"></div>
+                  <div class="bar-seg bar-pending" style="width:40%"></div>
+                  <div class="bar-seg bar-rejected" style="width:0%"></div>
+                </div>
+                <div class="crew-counts">
+                  <div class="crew-count-item"><div class="dot" style="background:var(--teal)"></div>18 Confirmed</div>
+                  <div class="crew-count-item"><div class="dot" style="background:var(--yellow)"></div>16 Pending</div>
+                  <div class="crew-count-item"><div class="dot" style="background:var(--red)"></div>0 Rejected</div>
+                </div>
+              </div>
+              <!-- Card 3 -->
+              <div class="prod-card">
+                <div class="prod-card-header">
+                  <div>
+                    <div class="prod-name">Urban Pulse</div>
+                    <div class="prod-dates">Tue, Apr 14 — Sat, Apr 18</div>
+                  </div>
+                  <div class="status-chip chip-draft">DRAFT</div>
+                </div>
+                <div class="crew-bar-label">
+                  <span>Crew Assembly</span>
+                  <span>0 / 35</span>
+                </div>
+                <div class="crew-bar-track">
+                  <div class="bar-seg bar-confirmed" style="width:0%"></div>
+                </div>
+                <div class="crew-counts">
+                  <div class="crew-count-item" style="color:var(--muted)">No crew assigned yet</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Calendar + Upcoming -->
+          <div>
+            <div class="mini-cal" style="margin-bottom:16px">
+              <div class="cal-header">
+                <div class="cal-month">April 2026</div>
+                <div style="display:flex;gap:8px">
+                  <span style="cursor:pointer;color:var(--muted);font-size:18px">‹</span>
+                  <span style="cursor:pointer;color:var(--muted);font-size:18px">›</span>
+                </div>
+              </div>
+              <div class="cal-grid">
+                <div class="cal-day-name">S</div><div class="cal-day-name">M</div><div class="cal-day-name">T</div><div class="cal-day-name">W</div><div class="cal-day-name">T</div><div class="cal-day-name">F</div><div class="cal-day-name">S</div>
+                <div class="cal-day muted">30</div><div class="cal-day muted">31</div><div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day has-event">5</div>
+                <div class="cal-day has-event">6</div><div class="cal-day has-event">7</div><div class="cal-day has-event">8</div><div class="cal-day has-event">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div>
+                <div class="cal-day">13</div><div class="cal-day has-event">14</div><div class="cal-day has-event">15</div><div class="cal-day has-event">16</div><div class="cal-day has-event">17</div><div class="cal-day has-event">18</div><div class="cal-day today">19</div>
+                <div class="cal-day">20</div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day">26</div>
+                <div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day muted">1</div><div class="cal-day muted">2</div><div class="cal-day muted">3</div>
+              </div>
+            </div>
+            <div class="info-note">
+              <h4>This Week</h4>
+              <div class="event-item">
+                <div class="event-dot-col"><div class="event-dot" style="background:var(--teal)"></div></div>
+                <div class="event-info"><h5>Midnight Reel — Day 1</h5><p>Apr 5 · Echo Park, LA</p></div>
+              </div>
+              <div class="event-item">
+                <div class="event-dot-col"><div class="event-dot" style="background:var(--blue)"></div></div>
+                <div class="event-info"><h5>Client Call — Urban Pulse</h5><p>Apr 7 · 2:00 PM</p></div>
+              </div>
+              <div class="event-item">
+                <div class="event-dot-col"><div class="event-dot" style="background:var(--orange)"></div></div>
+                <div class="event-info"><h5>Crew NDA Deadline</h5><p>Apr 9 · Dandelion Shoot</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 2 — NEW PRODUCTION FORM
+     ════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-1">
+<div class="desktop">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">VISIANARY</div></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <div class="nav-link"><span class="ico">⊞</span> Dashboard</div>
+        <div class="nav-link active"><span class="ico">🎬</span> Productions</div>
+        <div class="nav-link"><span class="ico">📷</span> Shoots</div>
+        <div class="nav-link"><span class="ico">👥</span> Crew</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Manage</div>
+        <div class="nav-link"><span class="ico">📋</span> Call Sheets</div>
+        <div class="nav-link"><span class="ico">💰</span> Finances</div>
+        <div class="nav-link"><span class="ico">📊</span> Performance</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="avatar-sm">KH</div>
+          <div><div class="user-name">Kate Huezo</div><div class="user-role">Producer</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="top-header">
+        <div class="header-left">
+          <h1>New Production</h1>
+          <div class="sub">Fill in the details to get started</div>
+        </div>
+        <div class="header-right">
+          <div class="bell-btn">🔔</div>
+          <div class="avatar-lg">KH</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="breadcrumb">Dashboard <span class="sep">/</span> Productions <span class="sep">/</span> <span>New Production</span></div>
+
+        <div class="two-col">
+          <!-- Form -->
+          <div class="form-card">
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Production Name *</label>
+                <input class="form-input" type="text" placeholder="e.g. Dandelion Shoot" value="Urban Pulse">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Client Name</label>
+                <input class="form-input" type="text" placeholder="e.g. Nike, Spotify…" value="Neon Records">
+              </div>
+            </div>
+            <div style="height:16px"></div>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Project Type</label>
+                <select class="form-select">
+                  <option>Music Video</option>
+                  <option>Commercial</option>
+                  <option>Film</option>
+                  <option>Event</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Estimated Budget</label>
+                <input class="form-input" type="text" placeholder="$0.00" value="$42,000">
+              </div>
+            </div>
+            <div style="height:16px"></div>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Shoot Start Date</label>
+                <input class="form-input" type="date" value="2026-04-14">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Shoot End Date</label>
+                <input class="form-input" type="date" value="2026-04-18">
+              </div>
+            </div>
+            <div style="height:16px"></div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input class="form-input" type="text" placeholder="City, studio, address…" value="Downtown LA — Arts District">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Project Notes</label>
+              <textarea class="form-textarea" placeholder="Brief for crew, mood, special requirements…">Gritty urban aesthetic, night shoots likely. Client wants raw, documentary-feel footage. 2 camera setups. Need experienced gaffer for low-light work.</textarea>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-orange" onclick="showScreen(2, document.querySelectorAll('.nav-btn')[2])">Save & Continue → Add Crew</button>
+              <button class="btn btn-ghost">Save Draft</button>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div>
+            <div class="summary-card">
+              <h3>Production Brief</h3>
+              <div class="summary-row"><div class="summary-key">Name</div><div class="summary-val">Urban Pulse</div></div>
+              <div class="summary-row"><div class="summary-key">Client</div><div class="summary-val">Neon Records</div></div>
+              <div class="summary-row"><div class="summary-key">Type</div><div class="summary-val">Music Video</div></div>
+              <div class="summary-row"><div class="summary-key">Dates</div><div class="summary-val">Apr 14–18, 2026</div></div>
+              <div class="summary-row"><div class="summary-key">Location</div><div class="summary-val">Downtown LA</div></div>
+              <div class="summary-row"><div class="summary-key">Budget</div><div class="summary-val">$42,000</div></div>
+              <div class="summary-divider"></div>
+              <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Next Steps</div>
+              <div style="font-size:13px;color:var(--muted)">After saving, you'll import your crew roster and send invitations.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 3 — UPLOAD EXCEL
+     ════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-2">
+<div class="desktop">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">VISIANARY</div></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <div class="nav-link"><span class="ico">⊞</span> Dashboard</div>
+        <div class="nav-link active"><span class="ico">🎬</span> Productions</div>
+        <div class="nav-link"><span class="ico">📷</span> Shoots</div>
+        <div class="nav-link"><span class="ico">👥</span> Crew</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Manage</div>
+        <div class="nav-link"><span class="ico">📋</span> Call Sheets</div>
+        <div class="nav-link"><span class="ico">💰</span> Finances</div>
+        <div class="nav-link"><span class="ico">📊</span> Performance</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="avatar-sm">KH</div>
+          <div><div class="user-name">Kate Huezo</div><div class="user-role">Producer</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="top-header">
+        <div class="header-left">
+          <h1>Add Crew — Urban Pulse</h1>
+          <div class="sub">Import your roster to get started</div>
+        </div>
+        <div class="header-right">
+          <div class="bell-btn">🔔</div>
+          <div class="avatar-lg">KH</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="breadcrumb">Productions <span class="sep">/</span> Urban Pulse <span class="sep">/</span> <span>Add Crew</span></div>
+
+        <!-- Step indicator -->
+        <div class="steps">
+          <div class="step active">
+            <div class="step-num">1</div>
+            <span>Import Contacts</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <span>Select Crew</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <span>Send Invites</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <!-- Success state (simulated after upload) -->
+            <div class="upload-success">
+              <div class="upload-icon">✅</div>
+              <div class="upload-info">
+                <h4>15 contacts imported from crew_roster.xlsx</h4>
+                <p>Uploaded just now · Grouped into 5 departments</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto">Replace</button>
+            </div>
+
+            <!-- Preview table -->
+            <div class="form-card" style="padding:0;overflow:hidden;margin-bottom:16px">
+              <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                <div style="font-size:13px;font-weight:800">Preview — First 5 rows</div>
+                <div style="font-size:11px;color:var(--muted)">+10 more</div>
+              </div>
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Department</th><th>Role</th><th>Phone</th><th>Rate / Day</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Sofia Reyes</td><td>Camera</td><td>Director of Photography</td><td>(213) 555-0333</td><td>$1,200</td></tr>
+                  <tr><td>Devon Park</td><td>Camera</td><td>1st AC</td><td>(424) 555-0212</td><td>$750</td></tr>
+                  <tr><td>John Smith</td><td>Lighting</td><td>Gaffer</td><td>(310) 555-0142</td><td>$850</td></tr>
+                  <tr><td>Leo Fontaine</td><td>Grip</td><td>Key Grip</td><td>(818) 555-0901</td><td>$800</td></tr>
+                  <tr><td>Rhys Okafor</td><td>Sound</td><td>Production Sound Mixer</td><td>(310) 555-0321</td><td>$950</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Drop zone (secondary, for re-upload) -->
+            <div class="dropzone" style="padding:32px;border-style:dashed" onclick="alert('File picker would open here')">
+              <div class="dropzone-icon" style="font-size:28px">📂</div>
+              <div style="font-size:13px;color:var(--muted)">Drop another file to replace, or <span style="color:var(--orange);font-weight:700;cursor:pointer">Browse</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:6px">Accepts .xlsx, .csv</div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:4px">
+              <button class="btn btn-orange" onclick="showScreen(3, document.querySelectorAll('.nav-btn')[3])">Review & Select Crew →</button>
+              <button class="btn btn-ghost">Add Manually</button>
+            </div>
+          </div>
+
+          <!-- Right info -->
+          <div>
+            <div class="info-note">
+              <h4>Required Columns</h4>
+              <table class="info-table">
+                <thead><tr><th>Column</th><th>Example</th></tr></thead>
+                <tbody>
+                  <tr><td>Name *</td><td>Sofia Reyes</td></tr>
+                  <tr><td>Department *</td><td>Camera</td></tr>
+                  <tr><td>Role *</td><td>DP</td></tr>
+                  <tr><td>Phone</td><td>(213) 555-0333</td></tr>
+                  <tr><td>Rate</td><td>$1,200</td></tr>
+                  <tr><td>Email</td><td>sofia@email.com</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:16px;font-size:12px;color:var(--muted)">
+                Columns not recognized will be ignored. You can map columns in the next step.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 4 — SELECT CREW (15 people, 3 selected)
+     ════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-3">
+<div class="desktop" style="min-height:900px">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">VISIANARY</div></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <div class="nav-link"><span class="ico">⊞</span> Dashboard</div>
+        <div class="nav-link"><span class="ico">🎬</span> Productions</div>
+        <div class="nav-link"><span class="ico">📷</span> Shoots</div>
+        <div class="nav-link active"><span class="ico">👥</span> Crew</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Manage</div>
+        <div class="nav-link"><span class="ico">📋</span> Call Sheets</div>
+        <div class="nav-link"><span class="ico">💰</span> Finances</div>
+        <div class="nav-link"><span class="ico">📊</span> Performance</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="avatar-sm">KH</div>
+          <div><div class="user-name">Kate Huezo</div><div class="user-role">Producer</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="top-header">
+        <div class="header-left">
+          <h1>Select Crew — Urban Pulse</h1>
+          <div class="sub">15 contacts imported · Select who to invite</div>
+        </div>
+        <div class="header-right">
+          <div style="font-size:14px;font-weight:800;color:var(--orange)">3 selected</div>
+          <div class="bell-btn">🔔</div>
+          <div class="avatar-lg">KH</div>
+        </div>
+      </div>
+
+      <div class="content" style="padding-bottom:0">
+        <div class="breadcrumb">Urban Pulse <span class="sep">/</span> Add Crew <span class="sep">/</span> <span>Select</span></div>
+
+        <!-- Steps -->
+        <div class="steps">
+          <div class="step done"><div class="step-num">✓</div><span>Import Contacts</span></div>
+          <div class="step-line"></div>
+          <div class="step active"><div class="step-num">2</div><span>Select Crew</span></div>
+          <div class="step-line"></div>
+          <div class="step"><div class="step-num">3</div><span>Send Invites</span></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="crew-filters">
+          <div class="search-box">🔍 Search by name or role…</div>
+          <div class="dept-tabs">
+            <div class="dept-tab active">All</div>
+            <div class="dept-tab">Camera</div>
+            <div class="dept-tab">Lighting</div>
+            <div class="dept-tab">Grip</div>
+            <div class="dept-tab">Sound</div>
+          </div>
+        </div>
+
+        <!-- Dept: Camera -->
+        <div class="dept-section">
+          <div class="dept-header">
+            <div class="dept-name">📷 Camera</div>
+            <div class="dept-count">3 contacts</div>
+          </div>
+          <div class="crew-row selected">
+            <div class="crew-checkbox">✓</div>
+            <div class="crew-avatar dept-camera">SR</div>
+            <div class="crew-info">
+              <div class="crew-name">Sofia Reyes</div>
+              <div class="crew-role">Director of Photography</div>
+            </div>
+            <div class="works-badge has-worked">Worked 7×</div>
+            <div class="crew-rate">$1,200 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(213) 555-0333</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-camera">DP</div>
+            <div class="crew-info">
+              <div class="crew-name">Devon Park</div>
+              <div class="crew-role">1st AC</div>
+            </div>
+            <div class="works-badge has-worked">Worked 3×</div>
+            <div class="crew-rate">$750 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(424) 555-0212</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-camera">TM</div>
+            <div class="crew-info">
+              <div class="crew-name">Tara Mitchell</div>
+              <div class="crew-role">Camera Operator</div>
+            </div>
+            <div class="works-badge">New</div>
+            <div class="crew-rate">$900 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(310) 555-0456</div>
+          </div>
+        </div>
+
+        <!-- Dept: Lighting -->
+        <div class="dept-section">
+          <div class="dept-header">
+            <div class="dept-name">💡 Lighting</div>
+            <div class="dept-count">3 contacts</div>
+          </div>
+          <div class="crew-row selected">
+            <div class="crew-checkbox">✓</div>
+            <div class="crew-avatar dept-lighting">JS</div>
+            <div class="crew-info">
+              <div class="crew-name">John Smith</div>
+              <div class="crew-role">Gaffer</div>
+            </div>
+            <div class="works-badge has-worked">Worked 4×</div>
+            <div class="crew-rate">$850 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(310) 555-0142</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-lighting">MW</div>
+            <div class="crew-info">
+              <div class="crew-name">Marcus Webb</div>
+              <div class="crew-role">Best Boy Electric</div>
+            </div>
+            <div class="works-badge has-worked">Worked 2×</div>
+            <div class="crew-rate">$650 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(323) 555-0198</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-lighting">PN</div>
+            <div class="crew-info">
+              <div class="crew-name">Priya Nair</div>
+              <div class="crew-role">Electrician</div>
+            </div>
+            <div class="works-badge">New</div>
+            <div class="crew-rate">$500 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(818) 555-0077</div>
+          </div>
+        </div>
+
+        <!-- Dept: Grip -->
+        <div class="dept-section">
+          <div class="dept-header">
+            <div class="dept-name">🎚️ Grip</div>
+            <div class="dept-count">3 contacts</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-grip">LF</div>
+            <div class="crew-info"><div class="crew-name">Leo Fontaine</div><div class="crew-role">Key Grip</div></div>
+            <div class="works-badge has-worked">Worked 5×</div>
+            <div class="crew-rate">$800 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(818) 555-0901</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-grip">AC</div>
+            <div class="crew-info"><div class="crew-name">Ana Carvalho</div><div class="crew-role">Best Boy Grip</div></div>
+            <div class="works-badge has-worked">Worked 1×</div>
+            <div class="crew-rate">$600 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(323) 555-0765</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-grip">BT</div>
+            <div class="crew-info"><div class="crew-name">Ben Torres</div><div class="crew-role">Grip</div></div>
+            <div class="works-badge">New</div>
+            <div class="crew-rate">$450 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(310) 555-0019</div>
+          </div>
+        </div>
+
+        <!-- Dept: Sound -->
+        <div class="dept-section">
+          <div class="dept-header">
+            <div class="dept-name">🎙️ Sound</div>
+            <div class="dept-count">2 contacts</div>
+          </div>
+          <div class="crew-row selected">
+            <div class="crew-checkbox">✓</div>
+            <div class="crew-avatar dept-sound">RO</div>
+            <div class="crew-info"><div class="crew-name">Rhys Okafor</div><div class="crew-role">Production Sound Mixer</div></div>
+            <div class="works-badge has-worked">Worked 9×</div>
+            <div class="crew-rate">$950 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(310) 555-0321</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-sound">ZT</div>
+            <div class="crew-info"><div class="crew-name">Zoe Tanaka</div><div class="crew-role">Boom Operator</div></div>
+            <div class="works-badge">New</div>
+            <div class="crew-rate">$550 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(424) 555-0987</div>
+          </div>
+        </div>
+
+        <!-- Dept: Production -->
+        <div class="dept-section">
+          <div class="dept-header">
+            <div class="dept-name">🎯 Production</div>
+            <div class="dept-count">4 contacts</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-production">KB</div>
+            <div class="crew-info"><div class="crew-name">Keisha Brown</div><div class="crew-role">Production Coordinator</div></div>
+            <div class="works-badge has-worked">Worked 6×</div>
+            <div class="crew-rate">$480 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(213) 555-0654</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-production">MC</div>
+            <div class="crew-info"><div class="crew-name">Matteo Cruz</div><div class="crew-role">Set PA</div></div>
+            <div class="works-badge">New</div>
+            <div class="crew-rate">$250 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(818) 555-0543</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-production">DW</div>
+            <div class="crew-info"><div class="crew-name">Dani Wells</div><div class="crew-role">Line Producer</div></div>
+            <div class="works-badge has-worked">Worked 3×</div>
+            <div class="crew-rate">$700 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(310) 555-0888</div>
+          </div>
+          <div class="crew-row">
+            <div class="crew-checkbox"></div>
+            <div class="crew-avatar dept-production">AK</div>
+            <div class="crew-info"><div class="crew-name">Alex Kim</div><div class="crew-role">Producer</div></div>
+            <div class="works-badge">New</div>
+            <div class="crew-rate">$900 / day</div>
+            <div style="font-size:11px;color:var(--muted)">(310) 555-0101</div>
+          </div>
+        </div>
+
+        <div style="height:100px"></div>
+      </div>
+
+      <!-- Sticky send bar -->
+      <div class="sticky-bar">
+        <div class="selected-preview">
+          <div class="selected-label">3 selected:</div>
+          <div class="selected-chips">
+            <div class="selected-chip">
+              <div class="crew-avatar dept-camera" style="width:22px;height:22px;font-size:9px">SR</div>
+              Sofia Reyes
+            </div>
+            <div class="selected-chip">
+              <div class="crew-avatar dept-lighting" style="width:22px;height:22px;font-size:9px">JS</div>
+              John Smith
+            </div>
+            <div class="selected-chip">
+              <div class="crew-avatar dept-sound" style="width:22px;height:22px;font-size:9px">RO</div>
+              Rhys Okafor
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-orange" onclick="showScreen(4, document.querySelectorAll('.nav-btn')[4])">Send Invites to 3 Crew Members →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 5 — NOTIFICATION (Sofia confirmed)
+     ════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-4">
+<div class="desktop">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">VISIANARY</div></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <div class="nav-link active"><span class="ico">⊞</span> Dashboard</div>
+        <div class="nav-link"><span class="ico">🎬</span> Productions</div>
+        <div class="nav-link"><span class="ico">📷</span> Shoots</div>
+        <div class="nav-link"><span class="ico">👥</span> Crew</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Manage</div>
+        <div class="nav-link"><span class="ico">📋</span> Call Sheets</div>
+        <div class="nav-link"><span class="ico">💰</span> Finances</div>
+        <div class="nav-link"><span class="ico">📊</span> Performance</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="avatar-sm">KH</div>
+          <div><div class="user-name">Kate Huezo</div><div class="user-role">Producer</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main" style="flex-direction:row;flex:1">
+      <!-- Dashboard content (condensed) -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:auto">
+        <div class="top-header">
+          <div class="header-left">
+            <h1>Dashboard</h1>
+            <div class="sub">Saturday, April 19, 2026</div>
+          </div>
+          <div class="header-right">
+            <button class="btn btn-orange btn-sm">+ New Production</button>
+            <div class="bell-btn">🔔<div class="bell-badge"></div></div>
+            <div class="avatar-lg">KH</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-label">Total Crew</div><div class="stat-value orange">3</div></div>
+            <div class="stat-card"><div class="stat-label">Confirmed</div><div class="stat-value teal">1</div></div>
+            <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value yellow">2</div></div>
+            <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value red">0</div></div>
+          </div>
+
+          <div class="section-header"><div class="section-title">Upcoming Productions</div></div>
+
+          <!-- Updated Dandelion card -->
+          <div class="prod-card" style="margin-bottom:12px;border-color:var(--teal);border-width:1.5px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--teal)"></div>
+              <span style="font-size:11px;font-weight:700;color:var(--teal)">CREW UPDATE</span>
+            </div>
+            <div class="prod-card-header">
+              <div>
+                <div class="prod-name">Urban Pulse</div>
+                <div class="prod-dates">Tue, Apr 14 — Sat, Apr 18 · 3 invited</div>
+              </div>
+              <div class="status-chip chip-active">ACTIVE</div>
+            </div>
+            <div class="crew-bar-label"><span>Crew Assembly</span><span>1 / 3</span></div>
+            <div class="crew-bar-track">
+              <div class="bar-seg bar-confirmed" style="width:33%"></div>
+              <div class="bar-seg bar-pending" style="width:67%"></div>
+            </div>
+            <div class="crew-counts">
+              <div class="crew-count-item"><div class="dot" style="background:var(--teal)"></div>1 Confirmed</div>
+              <div class="crew-count-item"><div class="dot" style="background:var(--yellow)"></div>2 Pending</div>
+            </div>
+          </div>
+
+          <div class="prod-card" style="margin-bottom:12px">
+            <div class="prod-card-header">
+              <div>
+                <div class="prod-name">Midnight Reel</div>
+                <div class="prod-dates">Sun, Apr 5 — Thu, Apr 9</div>
+              </div>
+              <div class="status-chip chip-upcoming">UPCOMING</div>
+            </div>
+            <div class="crew-bar-track" style="margin-top:12px">
+              <div class="bar-seg bar-confirmed" style="width:45%"></div>
+              <div class="bar-seg bar-pending" style="width:40%"></div>
+            </div>
+            <div class="crew-counts" style="margin-top:8px">
+              <div class="crew-count-item"><div class="dot" style="background:var(--teal)"></div>18 Confirmed</div>
+              <div class="crew-count-item"><div class="dot" style="background:var(--yellow)"></div>16 Pending</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification Panel -->
+      <div class="notif-panel">
+        <div class="notif-header">
+          <div class="notif-title">Notifications</div>
+          <div class="notif-badge">1 New</div>
+        </div>
+
+        <!-- Confirmed notification -->
+        <div class="notif-item unread" style="background:rgba(0,154,132,0.04);border-left:3px solid var(--teal)">
+          <div class="notif-avatar" style="background:var(--teal)">SR</div>
+          <div class="notif-body">
+            <div class="notif-text">Sofia Reyes confirmed for Urban Pulse ✓</div>
+            <div class="notif-meta">2 minutes ago · DP · $1,200/day</div>
+            <div class="notif-status">
+              <div class="status-badge badge-confirmed">CONFIRMED</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="notif-item">
+          <div class="notif-avatar" style="background:var(--yellow)">JS</div>
+          <div class="notif-body">
+            <div class="notif-text">John Smith — invite sent</div>
+            <div class="notif-meta">1 hour ago · Gaffer · $850/day</div>
+            <div class="notif-status">
+              <div class="status-badge badge-pending">PENDING</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="notif-item">
+          <div class="notif-avatar" style="background:var(--muted)">RO</div>
+          <div class="notif-body">
+            <div class="notif-text">Rhys Okafor — invite sent</div>
+            <div class="notif-meta">1 hour ago · Sound Mixer · $950/day</div>
+            <div class="notif-status">
+              <div class="status-badge badge-pending">PENDING</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="notif-cta">
+          <button class="btn btn-orange" style="width:100%;justify-content:center" onclick="showScreen(5, document.querySelectorAll('.nav-btn')[5])">View Crew Responses →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 6 — CREW RESPONSES
+     ════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-5">
+<div class="desktop">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">VISIANARY</div></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <div class="nav-link"><span class="ico">⊞</span> Dashboard</div>
+        <div class="nav-link"><span class="ico">🎬</span> Productions</div>
+        <div class="nav-link"><span class="ico">📷</span> Shoots</div>
+        <div class="nav-link active"><span class="ico">👥</span> Crew</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Manage</div>
+        <div class="nav-link"><span class="ico">📋</span> Call Sheets</div>
+        <div class="nav-link"><span class="ico">💰</span> Finances</div>
+        <div class="nav-link"><span class="ico">📊</span> Performance</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="avatar-sm">KH</div>
+          <div><div class="user-name">Kate Huezo</div><div class="user-role">Producer</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="top-header">
+        <div class="header-left">
+          <h1>Urban Pulse — Crew</h1>
+          <div class="sub">Apr 14–18, 2026 · Downtown LA</div>
+        </div>
+        <div class="header-right">
+          <div class="status-chip chip-active" style="padding:8px 16px">ACTIVE</div>
+          <div class="bell-btn">🔔<div class="bell-badge"></div></div>
+          <div class="avatar-lg">KH</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="breadcrumb">Productions <span class="sep">/</span> Urban Pulse <span class="sep">/</span> <span>Crew</span></div>
+
+        <!-- Stats bar -->
+        <div class="stats-row" style="margin-bottom:20px">
+          <div class="stat-card" style="flex:unset;padding:14px 20px;text-align:center">
+            <div class="stat-label">Invited</div>
+            <div style="font-size:22px;font-weight:800">3</div>
+          </div>
+          <div class="stat-card" style="flex:unset;padding:14px 20px;text-align:center;border-color:rgba(0,154,132,0.2)">
+            <div class="stat-label" style="color:var(--teal)">Confirmed</div>
+            <div style="font-size:22px;font-weight:800;color:var(--teal)">1</div>
+          </div>
+          <div class="stat-card" style="flex:unset;padding:14px 20px;text-align:center">
+            <div class="stat-label">Pending</div>
+            <div style="font-size:22px;font-weight:800;color:var(--yellow)">2</div>
+          </div>
+          <div class="stat-card" style="flex:unset;padding:14px 20px;text-align:center">
+            <div class="stat-label">Rejected</div>
+            <div style="font-size:22px;font-weight:800;color:var(--red)">0</div>
+          </div>
+          <div style="flex:1"></div>
+        </div>
+
+        <!-- Assembly progress -->
+        <div class="assembly-bar">
+          <div class="assembly-label">
+            <span>Crew Assembly Progress</span>
+            <span style="color:var(--teal)">1 of 3 confirmed</span>
+          </div>
+          <div class="assembly-track">
+            <div class="assembly-fill"></div>
+          </div>
+        </div>
+
+        <!-- Crew response rows -->
+        <div class="section-header">
+          <div class="section-title">Invited Crew</div>
+          <button class="btn btn-ghost btn-sm">+ Add More Crew</button>
+        </div>
+
+        <!-- Sofia — Confirmed -->
+        <div class="response-row" style="border-color:rgba(0,154,132,0.25);background:rgba(0,154,132,0.03)">
+          <div class="crew-avatar dept-camera">SR</div>
+          <div class="response-info">
+            <div class="response-name">Sofia Reyes</div>
+            <div class="response-sub">Director of Photography · Camera Dept</div>
+          </div>
+          <div class="status-badge badge-confirmed">CONFIRMED</div>
+          <div style="text-align:right">
+            <div class="response-rate">$1,200 / day</div>
+            <div class="response-time">Responded 2 min ago</div>
+          </div>
+          <div class="response-actions">
+            <button class="btn btn-orange btn-sm">Send NDA</button>
+          </div>
+        </div>
+
+        <!-- John — Pending -->
+        <div class="response-row">
+          <div class="crew-avatar dept-lighting">JS</div>
+          <div class="response-info">
+            <div class="response-name">John Smith</div>
+            <div class="response-sub">Gaffer · Lighting Dept</div>
+          </div>
+          <div class="status-badge badge-pending">PENDING</div>
+          <div style="text-align:right">
+            <div class="response-rate">$850 / day</div>
+            <div class="response-time">Sent 1 hr ago</div>
+          </div>
+          <div class="response-actions">
+            <button class="btn btn-ghost btn-sm">Resend</button>
+            <button class="btn btn-danger btn-sm">Remove</button>
+          </div>
+        </div>
+
+        <!-- Rhys — Pending -->
+        <div class="response-row">
+          <div class="crew-avatar dept-sound">RO</div>
+          <div class="response-info">
+            <div class="response-name">Rhys Okafor</div>
+            <div class="response-sub">Production Sound Mixer · Sound Dept</div>
+          </div>
+          <div class="status-badge badge-pending">PENDING</div>
+          <div style="text-align:right">
+            <div class="response-rate">$950 / day</div>
+            <div class="response-time">Sent 1 hr ago</div>
+          </div>
+          <div class="response-actions">
+            <button class="btn btn-ghost btn-sm">Resend</button>
+            <button class="btn btn-danger btn-sm">Remove</button>
+          </div>
+        </div>
+
+        <!-- Bottom CTAs -->
+        <div style="display:flex;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)">
+          <button class="btn btn-ghost">+ Add More Crew</button>
+          <button class="btn btn-orange" disabled style="opacity:0.4;cursor:not-allowed" title="Waiting for all crew to confirm">Proceed to Call Sheet → (2 pending)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function showScreen(index, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + index).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
 </html>
