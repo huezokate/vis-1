@@ -1693,6 +1693,14 @@ function showScreen(index, btn) {
   btn.classList.add('active');
   window.scrollTo(0, 0);
 }
+// Support ?screen=N for direct linking (used by Figma capture)
+(function() {
+  const p = new URLSearchParams(window.location.search).get('screen');
+  if (p !== null) {
+    const idx = Math.min(Math.max(parseInt(p) || 0, 0), 5);
+    showScreen(idx, document.querySelectorAll('.nav-btn')[idx]);
+  }
+})();
 </script>
 </body>
 </html>
