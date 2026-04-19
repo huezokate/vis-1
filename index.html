@@ -9,7 +9,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0A0E12;
+  --bg: rgba(5, 162, 215, 0.15);
   --surface: #F1F6F7;
   --card: #FFFFFF;
   --orange: #F25C05;
@@ -24,6 +24,7 @@
 }
 
 body {
+  background-color: #ffffff;
   background: var(--bg);
   font-family: 'Manrope', sans-serif;
   color: var(--text);
@@ -48,10 +49,10 @@ body {
 }
 .nav-btn {
   padding: 8px 16px;
-  border: 1.5px solid rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(5,162,215,0.3);
   border-radius: 100px;
-  background: transparent;
-  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.6);
+  color: rgba(5,162,215,0.8);
   font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -59,7 +60,7 @@ body {
   transition: all 0.2s;
   white-space: nowrap;
 }
-.nav-btn:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+.nav-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(255,255,255,0.9); }
 .nav-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
 
 /* ── Screen Wrapper ── */
@@ -74,8 +75,8 @@ body {
   background: var(--surface);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 24px 80px rgba(5,162,215,0.12), 0 4px 24px rgba(0,0,0,0.08);
+  border: 1px solid rgba(5,162,215,0.15);
   display: flex;
   flex-direction: column;
 }
@@ -494,21 +495,22 @@ body {
 /* ── Sticky Bottom Bar ── */
 .sticky-bar {
   position: sticky; bottom: 0;
-  background: var(--bg);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
   padding: 16px 32px;
   display: flex; align-items: center; justify-content: space-between;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(5,162,215,0.15);
 }
 .selected-preview { display: flex; align-items: center; gap: 12px; }
 .selected-chips { display: flex; gap: 6px; }
 .selected-chip {
   display: flex; align-items: center; gap: 6px;
   padding: 6px 10px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(5,162,215,0.08);
   border-radius: 100px;
-  font-size: 11px; font-weight: 700; color: #fff;
+  font-size: 11px; font-weight: 700; color: var(--text);
 }
-.selected-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+.selected-label { font-size: 13px; color: var(--muted); }
 
 /* ── Notification Panel ── */
 .notif-panel {
