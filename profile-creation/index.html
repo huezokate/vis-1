@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visianary — Crew Profile Creation</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #F1F6F7;
+  --card:    #F5F9FA;
+  --white:   #FFFFFF;
+  --orange:  #F25C05;
+  --teal:    #009A84;
+  --yellow:  #F1BD00;
+  --blue:    #05A2D7;
+  --red:     #E24B4A;
+  --muted:   #8A9BAE;
+  --text:    #0A0E12;
+  --border:  rgba(10,14,18,0.08);
+  --border-s: rgba(10,14,18,0.15);
+}
+
+body {
+  background: #E2EDF0;
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px 24px 60px;
+}
+
+/* ── Dev nav ── */
+.dev-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.dev-nav-row2 { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.dev-label { font-family: 'Bebas Neue', cursive; font-size: 15px; color: var(--orange); letter-spacing: 2px; margin-right: 6px; white-space: nowrap; }
+.dev-btn { padding: 6px 13px; border: 1.5px solid rgba(5,162,215,0.3); border-radius: 100px; background: rgba(255,255,255,0.7); color: rgba(5,162,215,0.8); font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.dev-btn:hover { border-color: var(--blue); color: var(--blue); }
+.dev-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+.path-toggle { display: flex; gap: 0; border: 1.5px solid var(--border-s); border-radius: 8px; overflow: hidden; }
+.path-btn { padding: 6px 14px; font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; border: none; background: rgba(255,255,255,0.7); color: var(--muted); transition: all 0.2s; }
+.path-btn.active { background: var(--text); color: #fff; }
+
+/* ── Screen ── */
+.screen { display: none; justify-content: center; }
+.screen.active { display: flex; }
+
+/* ── Phone shell ── */
+.phone { width: 390px; background: var(--bg); border-radius: 48px; overflow: hidden; box-shadow: 0 48px 120px rgba(5,162,215,0.15), 0 8px 32px rgba(0,0,0,0.12); border: 8px solid #1A2530; position: relative; display: flex; flex-direction: column; min-height: 844px; }
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 126px; height: 34px; background: #1A2530; border-radius: 0 0 20px 20px; z-index: 20; }
+.phone-content { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+.phone-content::-webkit-scrollbar { display: none; }
+
+/* ── App header ── */
+.app-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 52px 20px 12px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.logo { font-family: 'Bebas Neue', cursive; font-size: 22px; color: var(--orange); letter-spacing: 2px; }
+.avatar-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', cursive; font-size: 12px; color: #fff; cursor: pointer; letter-spacing: 1px; }
+
+/* ── Onboarding header ── */
+.ob-header { display: flex; align-items: center; justify-content: space-between; padding: 48px 24px 0; margin-bottom: 16px; }
+.pad { padding: 20px 24px; }
+
+/* ── Bottom nav ── */
+.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 75px; background: var(--white); border-top: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 10; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.nav-item.active { color: var(--orange); }
+.nav-icon { font-size: 20px; line-height: 1.4; }
+
+/* ── Stepper ── */
+.stepper { display: flex; align-items: center; justify-content: center; padding: 0 24px; margin-bottom: 24px; }
+.step-node { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; transition: all 0.3s; flex-shrink: 0; }
+.step-node.done   { background: var(--teal);   color: #fff; border: none; }
+.step-node.active { background: var(--orange); color: #fff; border: none; }
+.step-node.idle   { background: transparent;   color: var(--muted); border: 2px solid var(--muted); }
+.step-line { height: 2px; flex: 1; margin: 0 6px; transition: background 0.3s; }
+.step-line.done { background: var(--teal); }
+.step-line.idle { background: var(--border-s); }
+
+/* ── Typography ── */
+.display { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+.subtext { font-size: 13px; color: var(--muted); font-weight: 500; }
+.req-note { font-size: 11px; color: var(--orange); font-weight: 600; margin-bottom: 22px; }
+
+/* ── Back btn ── */
+.back-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 0; margin-bottom: 20px; }
+
+/* ── Fields ── */
+.field { margin-bottom: 18px; }
+.field label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: 0.3px; text-transform: uppercase; }
+.field .hint { font-size: 11px; color: var(--muted); margin-top: 5px; font-weight: 500; }
+input[type=text], input[type=email], input[type=password], input[type=tel], input[type=url], textarea {
+  width: 100%; padding: 13px 14px; background: var(--white); border: 1.5px solid var(--border-s); border-radius: 10px; color: var(--text); font-size: 14px; font-family: 'Manrope', sans-serif; font-weight: 500; transition: border-color 0.15s; outline: none;
+}
+input:focus, textarea:focus { border-color: var(--orange); }
+input::placeholder, textarea::placeholder { color: var(--muted); }
+textarea { resize: none; line-height: 1.55; }
+.input-wrap { position: relative; }
+.input-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; font-weight: 600; pointer-events: none; }
+.input-prefix + input { padding-left: 28px; }
+.input-action { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); font-size: 11px; font-weight: 700; font-family: 'Manrope', sans-serif; letter-spacing: 0.5px; }
+
+/* ── Seg select ── */
+.seg-select { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg-btn { padding: 9px 16px; border-radius: 8px; border: 2px solid var(--border-s); background: var(--white); color: var(--text); font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.seg-btn.selected { border-color: var(--orange); background: rgba(242,92,5,0.08); color: var(--orange); }
+
+/* ── Buttons ── */
+.btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px 20px; border-radius: 10px; font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: var(--orange); color: #fff; }
+.btn-primary:hover { background: #d94f00; }
+.btn-ghost { background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; border: none; }
+.btn-outline { background: transparent; border: 1.5px solid var(--border-s); color: var(--text); font-size: 13px; }
+.btn-teal { background: var(--teal); color: #fff; }
+
+/* ── Cards ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+.card-white { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+
+/* ── Alerts ── */
+.alert { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; margin-bottom: 14px; }
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert-yellow { background: rgba(241,189,0,0.1); border: 1px solid rgba(241,189,0,0.3); }
+.alert-blue   { background: rgba(5,162,215,0.07); border: 1px solid rgba(5,162,215,0.22); }
+.alert-orange { background: rgba(242,92,5,0.07); border: 1px solid rgba(242,92,5,0.2); }
+.alert-green  { background: rgba(0,154,132,0.07); border: 1px solid rgba(0,154,132,0.2); }
+.alert p { font-size: 13px; line-height: 1.55; color: var(--text); }
+.alert p strong { font-weight: 800; }
+.alert .sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* ── Upload zone ── */
+.upload-zone { border: 2px dashed rgba(10,14,18,0.18); border-radius: 12px; padding: 24px 16px; text-align: center; cursor: pointer; background: var(--white); transition: border-color 0.2s; }
+.upload-zone:hover { border-color: var(--orange); }
+.zone-icon { font-size: 26px; margin-bottom: 8px; }
+.zone-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.zone-sub { font-size: 12px; color: var(--muted); }
+.file-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: rgba(0,154,132,0.07); border-radius: 8px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--text); }
+.file-check { color: var(--teal); font-size: 14px; }
+
+/* ── Checkbox row ── */
+.check-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.check-row:last-child { border-bottom: none; }
+.check-box { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border-s); background: var(--white); flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; margin-top: 1px; }
+.check-box.checked { background: var(--teal); border-color: var(--teal); }
+.check-box.checked::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 800; }
+.check-text { font-size: 13px; line-height: 1.5; color: var(--text); font-weight: 500; flex: 1; }
+
+/* ── Skill accordion ── */
+.cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+.cat-card { background: var(--white); border: 2px solid var(--border); border-radius: 14px; padding: 16px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
+.cat-card:hover { border-color: rgba(242,92,5,0.3); }
+.cat-card.selected { border-color: var(--orange); background: rgba(242,92,5,0.05); }
+.cat-emoji { font-size: 24px; flex-shrink: 0; }
+.cat-label { font-size: 13px; font-weight: 800; color: var(--text); }
+.cat-count { font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 1px; }
+
+.accordion-section { margin-bottom: 16px; display: none; }
+.accordion-section.open { display: block; }
+.accordion-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card); border-radius: 10px 10px 0 0; border: 1px solid var(--border); border-bottom: none; }
+.accordion-title { font-size: 13px; font-weight: 800; color: var(--text); }
+.accordion-body { padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; }
+.chip-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip { padding: 7px 13px; border-radius: 100px; border: 1.5px solid var(--border-s); background: var(--white); color: var(--text); font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.chip.selected { border-color: var(--orange); background: rgba(242,92,5,0.08); color: var(--orange); }
+.skills-count { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; background: rgba(0,154,132,0.08); font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 14px; }
+
+/* ── Progress bar ── */
+.progress-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* ── Profile avatar ── */
+.profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', cursive; font-size: 22px; color: #fff; letter-spacing: 1px; flex-shrink: 0; }
+
+/* ── Skill tag ── */
+.skill-tag { padding: 4px 11px; border-radius: 100px; background: rgba(242,92,5,0.08); border: 1px solid rgba(242,92,5,0.2); color: var(--orange); font-size: 11px; font-weight: 700; }
+
+/* ── Info row ── */
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.info-row:last-child { border-bottom: none; }
+.info-key { font-size: 12px; font-weight: 600; color: var(--muted); }
+.info-val { font-size: 13px; font-weight: 700; color: var(--text); text-align: right; }
+
+/* ── Badge ── */
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 0.4px; }
+.badge-confirmed { background: rgba(0,154,132,0.1); color: var(--teal); }
+
+/* ── NDA doc ── */
+.nda-doc { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 14px; }
+.nda-sig-box { border: 1.5px dashed rgba(10,14,18,0.2); border-radius: 8px; padding: 24px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+.nda-sig-box:hover { border-color: var(--orange); }
+.nda-sig-done { border: 1.5px solid var(--teal); border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; background: rgba(0,154,132,0.05); }
+
+/* ── Profile action card ── */
+.action-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: border-color 0.2s; }
+.action-card:hover { border-color: rgba(242,92,5,0.4); }
+.action-card.done { border-color: var(--teal); }
+.action-icon-wrap { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.action-title { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+.action-sub { font-size: 12px; color: var(--muted); font-weight: 500; line-height: 1.4; }
+.action-arrow { margin-left: auto; font-size: 16px; color: var(--muted); flex-shrink: 0; }
+
+/* ── Network member chip ── */
+.network-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-top: 10px; }
+.network-row::-webkit-scrollbar { display: none; }
+.network-chip { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+.n-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', cursive; font-size: 14px; color: #fff; }
+.n-name { font-size: 10px; font-weight: 600; color: var(--muted); text-align: center; max-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Welcome / Stats ── */
+.welcome-shell { min-height: 844px; display: flex; flex-direction: column; padding: 52px 28px 36px; background: var(--bg); }
+.stat-grid { display: flex; border-top: 1px solid var(--border); padding-top: 20px; margin-top: auto; }
+.stat-col { flex: 1; text-align: center; }
+.stat-col:not(:last-child) { border-right: 1px solid var(--border); }
+.stat-num { font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--orange); }
+.stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* ── Gig CTA ── */
+.gig-cta { background: var(--orange); border-radius: 14px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 12px; }
+
+/* ── Orange hero ── */
+.orange-hero { background: var(--orange); padding: 32px 20px 28px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- ── Dev navigator ── -->
+<div class="dev-nav">
+  <div class="dev-label">VISIANARY · PROFILE FLOW</div>
+  <button class="dev-btn active"  onclick="goTo(0,this)">0 · Welcome</button>
+  <button class="dev-btn" onclick="goTo(1,this)">1 · Basic Info</button>
+  <button class="dev-btn" onclick="goTo(2,this)">2 · W-9 &amp; Compliance</button>
+  <button class="dev-btn" onclick="goTo(3,this)">3 · Skills</button>
+  <button class="dev-btn" onclick="goTo(4,this)">4 · NDA <span style="opacity:.6;font-size:9px;">invited</span></button>
+  <button class="dev-btn" onclick="goTo(5,this)">5 · Booked! <span style="opacity:.6;font-size:9px;">invited</span></button>
+  <button class="dev-btn" onclick="goTo(6,this)">6 · Profile</button>
+</div>
+<div class="dev-nav-row2">
+  <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">User path:</span>
+  <div class="path-toggle">
+    <button class="path-btn active" id="path-invited" onclick="setPath('invited')">🔗 Invited via link</button>
+    <button class="path-btn" id="path-organic" onclick="setPath('organic')">🌱 Self-onboarded</button>
+  </div>
+  <span style="font-size:11px;color:var(--muted);font-weight:500;">Path affects where Screen 3 "Continue" leads</span>
+</div>
+
+
+<!-- ══ SCREEN 0 — WELCOME ══════════════════════════════════════ -->
+<div class="screen active" id="s0">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="welcome-shell">
+    <div style="margin-bottom:40px">
+      <div class="logo" style="font-size:30px;letter-spacing:2px;">visianary</div>
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-top:2px;">film production marketplace</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(242,92,5,0.09);border-radius:100px;padding:6px 14px;margin-bottom:22px;width:fit-content;">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--orange);display:inline-block;"></span>
+        <span style="font-size:11px;font-weight:800;color:var(--orange);letter-spacing:.8px;text-transform:uppercase;">For Film Crew</span>
+      </div>
+      <div class="display" style="font-size:clamp(52px,15vw,68px);line-height:.92;margin-bottom:26px;letter-spacing:2px;color:var(--text);">
+        GET HIRED.<br>SHOW UP.<br><span style="color:var(--orange);">GET PAID.</span>
+      </div>
+      <p style="font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:36px;font-weight:500;">
+        Visianary is the marketplace for film production jobs. Crew members with complete profiles get <strong style="color:var(--text);">25% more opportunities</strong>.
+      </p>
+      <button class="btn btn-primary" onclick="goTo(1,document.querySelectorAll('.dev-btn')[1])" style="font-size:16px;padding:16px;margin-bottom:14px;border-radius:12px;">
+        Create Your Profile Now
+      </button>
+      <p style="text-align:center;font-size:13px;color:var(--muted);font-weight:500;">
+        Are you a producer? <a href="#" style="color:var(--orange);font-weight:700;text-decoration:none;">Book time with our sales rep →</a>
+      </p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-col"><div class="stat-num">2,400+</div><div class="stat-label">Crew members</div></div>
+      <div class="stat-col"><div class="stat-num">840+</div><div class="stat-label">Productions</div></div>
+      <div class="stat-col"><div class="stat-num">$3.2M</div><div class="stat-label">Paid out</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ SCREEN 1 — BASIC INFO ════════════════════════════════════ -->
+<div class="screen" id="s1">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="phone-content">
+    <div class="pad" style="padding-top:0;">
+      <div class="ob-header">
+        <div class="logo">visianary</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700;">film production marketplace</div>
+      </div>
+      <div style="padding:0 24px;">
+        <button class="back-btn" onclick="goTo(0,document.querySelectorAll('.dev-btn')[0])">← Back</button>
+        <div class="stepper">
+          <div class="step-node active">1</div>
+          <div class="step-line idle"></div>
+          <div class="step-node idle">2</div>
+          <div class="step-line idle"></div>
+          <div class="step-node idle">3</div>
+        </div>
+        <div class="display" style="font-size:26px;letter-spacing:1px;margin-bottom:4px;">LET'S SET UP YOUR BASIC INFO</div>
+        <p class="subtext" style="margin-bottom:6px;">Step 1 of 3</p>
+        <p class="req-note">* All fields are required</p>
+
+        <div class="field">
+          <label>Full Legal Name <span style="color:var(--orange);">*</span></label>
+          <input type="text" id="s1-fullname" placeholder="Jane Smith">
+        </div>
+        <div class="field">
+          <label>Preferred Name / Display Name <span style="color:var(--orange);">*</span></label>
+          <input type="text" id="s1-preferred" placeholder="Jane">
+        </div>
+        <div class="field">
+          <label>Email <span style="color:var(--orange);">*</span></label>
+          <input type="email" id="s1-email" placeholder="jane@example.com">
+          <p class="hint">This will be your username</p>
+        </div>
+        <div class="field">
+          <label>Password <span style="color:var(--orange);">*</span></label>
+          <div class="input-wrap" style="position:relative;">
+            <input type="password" id="s1-pw" placeholder="Create a password" style="padding-right:60px;">
+            <button class="input-action" onclick="togglePw('s1-pw',this)">SHOW</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirm Password <span style="color:var(--orange);">*</span></label>
+          <div class="input-wrap" style="position:relative;">
+            <input type="password" id="s1-cpw" placeholder="Re-enter your password" style="padding-right:60px;">
+            <button class="input-action" onclick="togglePw('s1-cpw',this)">SHOW</button>
+          </div>
+          <p class="hint" id="pw-hint" style="display:none;color:var(--red);">Passwords don't match</p>
+        </div>
+        <div class="field">
+          <label>Location — City / Region <span style="color:var(--orange);">*</span></label>
+          <input type="text" id="s1-loc" placeholder="Los Angeles, CA">
+        </div>
+        <div class="field">
+          <label>Phone Number <span style="color:var(--orange);">*</span></label>
+          <input type="tel" id="s1-phone" placeholder="+1 (555) 000-0000">
+          <p class="hint">Used for shoot-day alerts only</p>
+        </div>
+        <div class="field">
+          <label>Professional Headline / Role Seeking <span style="color:var(--orange);">*</span></label>
+          <input type="text" id="s1-headline" placeholder="Grip • Gaffer • Set PA">
+        </div>
+        <div class="field">
+          <label>Seniority Level <span style="color:var(--orange);">*</span></label>
+          <div class="seg-select" id="seg-seniority">
+            <button class="seg-btn" onclick="pickSeg(this,'seg-seniority')">Entry</button>
+            <button class="seg-btn" onclick="pickSeg(this,'seg-seniority')">Mid</button>
+            <button class="seg-btn" onclick="pickSeg(this,'seg-seniority')">Senior</button>
+            <button class="seg-btn" onclick="pickSeg(this,'seg-seniority')">Dept Head</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Years of Experience <span style="color:var(--orange);">*</span></label>
+          <div class="seg-select" id="seg-exp">
+            <button class="seg-btn" onclick="pickSeg(this,'seg-exp')">0–1</button>
+            <button class="seg-btn" onclick="pickSeg(this,'seg-exp')">2–5</button>
+            <button class="seg-btn" onclick="pickSeg(this,'seg-exp')">6–10</button>
+            <button class="seg-btn" onclick="pickSeg(this,'seg-exp')">10+</button>
+          </div>
+        </div>
+        <div style="margin-top:32px;">
+          <button class="btn btn-primary" onclick="goToS2()">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ SCREEN 2 — W-9 & COMPLIANCE ══════════════════════════════ -->
+<div class="screen" id="s2">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="phone-content">
+    <div class="pad" style="padding-top:0;">
+      <div class="ob-header">
+        <div class="logo">visianary</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700;">film production marketplace</div>
+      </div>
+      <div style="padding:0 24px;">
+        <button class="back-btn" onclick="goTo(1,document.querySelectorAll('.dev-btn')[1])">← Back</button>
+        <div class="stepper">
+          <div class="step-node done">✓</div>
+          <div class="step-line done"></div>
+          <div class="step-node active">2</div>
+          <div class="step-line idle"></div>
+          <div class="step-node idle">3</div>
+        </div>
+        <div class="display" style="font-size:26px;letter-spacing:1px;margin-bottom:4px;">TAX &amp; COMPLIANCE</div>
+        <p class="subtext" style="margin-bottom:20px;">Step 2 of 3</p>
+
+        <!-- Disclaimer banner -->
+        <div class="alert alert-yellow" style="margin-bottom:20px;">
+          <div class="alert-icon">⚠️</div>
+          <div>
+            <p><strong>You can skip this for now</strong> — but you'll only be able to view the specific gig you were invited to. Browsing the full job marketplace requires completing this step.</p>
+          </div>
+        </div>
+
+        <!-- W-9 section -->
+        <p style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px;">Federal Tax Form W-9</p>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:500;">Required to receive any payments through Visianary. Upload a signed W-9 or complete it digitally.</p>
+
+        <div class="upload-zone" id="w9-zone" onclick="mockW9Upload()" style="margin-bottom:6px;">
+          <div class="zone-icon">📄</div>
+          <div class="zone-title">Upload your W-9</div>
+          <div class="zone-sub">PDF or image · Signed &amp; dated</div>
+        </div>
+        <div id="w9-done" class="file-item" style="display:none;margin-bottom:14px;">
+          <span class="file-check">✓</span> w9_form_signed.pdf
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- State contractor regs -->
+        <p style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px;">State Contractor Acknowledgments</p>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;font-weight:500;">Required by California AB-5 and equivalent laws in your state. Check all that apply.</p>
+
+        <div class="card-white" style="padding:4px 18px;">
+          <div class="check-row">
+            <div class="check-box" id="ck1" onclick="toggleCheck(this)"></div>
+            <div class="check-text">I confirm I am operating as an independent contractor and have my own business entity or sole proprietorship.</div>
+          </div>
+          <div class="check-row">
+            <div class="check-box" id="ck2" onclick="toggleCheck(this)"></div>
+            <div class="check-text">I understand I am responsible for my own taxes, insurance, and worker protections as a freelance contractor.</div>
+          </div>
+          <div class="check-row">
+            <div class="check-box" id="ck3" onclick="toggleCheck(this)"></div>
+            <div class="check-text">I have reviewed the applicable state contractor regulations for my work location.</div>
+          </div>
+        </div>
+
+        <div class="alert alert-blue" style="margin-top:6px;margin-bottom:24px;">
+          <div class="alert-icon">ℹ️</div>
+          <p>Visianary is not a co-employer. Compliance requirements vary by state — <a href="#" style="color:var(--orange);font-weight:700;text-decoration:none;">view full guidance →</a></p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn btn-primary" onclick="goTo(3,document.querySelectorAll('.dev-btn')[3])">Save &amp; Continue →</button>
+          <button class="btn btn-ghost" onclick="goTo(3,document.querySelectorAll('.dev-btn')[3])">Skip for now — limits my access</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ SCREEN 3 — SKILLS ═════════════════════════════════════════ -->
+<div class="screen" id="s3">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="phone-content">
+    <div class="pad" style="padding-top:0;">
+      <div class="ob-header">
+        <div class="logo">visianary</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700;">film production marketplace</div>
+      </div>
+      <div style="padding:0 24px;">
+        <button class="back-btn" onclick="goTo(2,document.querySelectorAll('.dev-btn')[2])">← Back</button>
+        <div class="stepper">
+          <div class="step-node done">✓</div>
+          <div class="step-line done"></div>
+          <div class="step-node done">✓</div>
+          <div class="step-line done"></div>
+          <div class="step-node active">3</div>
+        </div>
+        <div class="display" style="font-size:26px;letter-spacing:1px;margin-bottom:4px;">YOUR SKILLS &amp; PORTFOLIO</div>
+        <p class="subtext" style="margin-bottom:6px;">Step 3 of 3 · All optional</p>
+
+        <div id="skills-count-bar" class="skills-count" style="display:none;">
+          <span>✓</span><span id="skills-count-txt">0 skills selected</span>
+        </div>
+
+        <!-- Category grid -->
+        <p style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;">Select your area(s) of expertise</p>
+        <div class="cat-grid">
+          <div class="cat-card" id="cat-camera" onclick="toggleCat('camera')">
+            <div class="cat-emoji">🎥</div>
+            <div><div class="cat-label">Camera</div><div class="cat-count">9 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-lighting" onclick="toggleCat('lighting')">
+            <div class="cat-emoji">💡</div>
+            <div><div class="cat-label">Lighting</div><div class="cat-count">4 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-grip" onclick="toggleCat('grip')">
+            <div class="cat-emoji">🔧</div>
+            <div><div class="cat-label">Grip</div><div class="cat-count">4 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-sound" onclick="toggleCat('sound')">
+            <div class="cat-emoji">🎙️</div>
+            <div><div class="cat-label">Sound</div><div class="cat-count">4 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-production" onclick="toggleCat('production')">
+            <div class="cat-emoji">📋</div>
+            <div><div class="cat-label">Production</div><div class="cat-count">7 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-art" onclick="toggleCat('art')">
+            <div class="cat-emoji">🎨</div>
+            <div><div class="cat-label">Art</div><div class="cat-count">5 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-makeup" onclick="toggleCat('makeup')">
+            <div class="cat-emoji">💄</div>
+            <div><div class="cat-label">Makeup</div><div class="cat-count">4 skills</div></div>
+          </div>
+          <div class="cat-card" id="cat-post" onclick="toggleCat('post')">
+            <div class="cat-emoji">✂️</div>
+            <div><div class="cat-label">Post</div><div class="cat-count">5 skills</div></div>
+          </div>
+        </div>
+
+        <!-- Skill accordions (show when category selected) -->
+        <div id="acc-camera" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">🎥 Camera Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-camera-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'camera')">Camera Op — RED</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Camera Op — ARRI</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Camera Op — Sony FX</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Cinematography</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Gimbal / Steadicam</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Drone (FAA cert.)</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Color Grading</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Lens Selection</button>
+              <button class="chip" onclick="toggleChip(this,'camera')">Live Event Filming</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-lighting" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">💡 Lighting Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-lighting-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'lighting')">Gaffer</button>
+              <button class="chip" onclick="toggleChip(this,'lighting')">Best Boy Electric</button>
+              <button class="chip" onclick="toggleChip(this,'lighting')">Electrician</button>
+              <button class="chip" onclick="toggleChip(this,'lighting')">Lighting Collab</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-grip" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">🔧 Grip Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-grip-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'grip')">Key Grip</button>
+              <button class="chip" onclick="toggleChip(this,'grip')">Best Boy Grip</button>
+              <button class="chip" onclick="toggleChip(this,'grip')">Grip</button>
+              <button class="chip" onclick="toggleChip(this,'grip')">Dolly Grip</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-sound" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">🎙️ Sound Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-sound-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'sound')">Production Sound Mixer</button>
+              <button class="chip" onclick="toggleChip(this,'sound')">Boom Operator</button>
+              <button class="chip" onclick="toggleChip(this,'sound')">Sound Designer</button>
+              <button class="chip" onclick="toggleChip(this,'sound')">Playback Operator</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-production" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">📋 Production Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-production-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'production')">Line Producer</button>
+              <button class="chip" onclick="toggleChip(this,'production')">Production Coordinator</button>
+              <button class="chip" onclick="toggleChip(this,'production')">1st AD</button>
+              <button class="chip" onclick="toggleChip(this,'production')">2nd AD</button>
+              <button class="chip" onclick="toggleChip(this,'production')">Set PA</button>
+              <button class="chip" onclick="toggleChip(this,'production')">Script Supervisor</button>
+              <button class="chip" onclick="toggleChip(this,'production')">Production Assistant</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-art" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">🎨 Art Department Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-art-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'art')">Production Designer</button>
+              <button class="chip" onclick="toggleChip(this,'art')">Set Decorator</button>
+              <button class="chip" onclick="toggleChip(this,'art')">Props Master</button>
+              <button class="chip" onclick="toggleChip(this,'art')">Art Director</button>
+              <button class="chip" onclick="toggleChip(this,'art')">Scenic Painter</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-makeup" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">💄 Hair &amp; Makeup Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-makeup-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'makeup')">Hair Stylist</button>
+              <button class="chip" onclick="toggleChip(this,'makeup')">Makeup Artist</button>
+              <button class="chip" onclick="toggleChip(this,'makeup')">Key MUA</button>
+              <button class="chip" onclick="toggleChip(this,'makeup')">SFX Makeup</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="acc-post" class="accordion-section">
+          <div class="accordion-header">
+            <span class="accordion-title">✂️ Post Production Skills</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:600;" id="acc-post-ct">0 selected</span>
+          </div>
+          <div class="accordion-body">
+            <div class="chip-wrap">
+              <button class="chip" onclick="toggleChip(this,'post')">Editor</button>
+              <button class="chip" onclick="toggleChip(this,'post')">Colorist</button>
+              <button class="chip" onclick="toggleChip(this,'post')">VFX Artist</button>
+              <button class="chip" onclick="toggleChip(this,'post')">Motion Graphics</button>
+              <button class="chip" onclick="toggleChip(this,'post')">Sound Editor</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social links (optional, collapsible) -->
+        <div style="margin-top:24px;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:14px 16px;background:var(--card);border-radius:12px;" onclick="toggleSocials()">
+            <div>
+              <span style="font-size:14px;font-weight:800;color:var(--text);">Share Your Socials</span>
+              <span style="font-size:11px;color:var(--muted);font-weight:600;margin-left:8px;">Optional</span>
+            </div>
+            <span id="socials-arrow" style="color:var(--muted);font-size:14px;">▸</span>
+          </div>
+          <div id="socials-panel" style="display:none;background:var(--card);border-radius:0 0 12px 12px;padding:0 16px 16px;border-top:1px solid var(--border);">
+            <div class="field" style="margin-top:14px;">
+              <label>Instagram</label>
+              <div class="input-wrap"><span class="input-prefix">@</span><input type="text" placeholder="yourhandle" style="padding-left:28px;"></div>
+            </div>
+            <div class="field">
+              <label>Personal Website</label>
+              <input type="url" placeholder="https://yoursite.com">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>IMDb Profile URL</label>
+              <input type="url" placeholder="https://imdb.com/name/nm...">
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:24px;">
+          <button class="btn btn-primary" id="s3-continue-btn" onclick="afterSkills()">Continue →</button>
+          <button class="btn btn-ghost" onclick="afterSkills()">Skip skills — continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ SCREEN 4 — NDA SIGN (invited path) ════════════════════════ -->
+<div class="screen" id="s4">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="phone-content">
+    <!-- App header -->
+    <div class="app-header" style="padding-right:20px;">
+      <button class="back-btn" style="margin:0;" onclick="goTo(3,document.querySelectorAll('.dev-btn')[3])">← Back</button>
+      <span class="logo">visianary</span>
+    </div>
+    <div class="pad">
+      <div class="display" style="font-size:24px;letter-spacing:1px;margin-bottom:4px;">SIGN YOUR NDA</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;font-weight:500;">Urban Pulse · Neon Records · Required before booking</p>
+
+      <!-- Stepper dots -->
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:20px;">
+        <div style="width:8px;height:8px;border-radius:4px;background:var(--teal);"></div>
+        <div style="width:8px;height:8px;border-radius:4px;background:var(--teal);"></div>
+        <div style="width:20px;height:8px;border-radius:4px;background:var(--orange);"></div>
+        <div style="width:8px;height:8px;border-radius:4px;background:var(--border);"></div>
+      </div>
+
+      <!-- NDA doc -->
+      <div class="nda-doc">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <span style="font-size:28px;">📄</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);">Non-Disclosure Agreement</div>
+            <div style="font-size:11px;color:var(--muted);">Neon Records × Urban Pulse · 2 pages</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;">
+          This Non-Disclosure Agreement ("Agreement") is entered into as of April 11, 2026, between Neon Records LLC ("Client") and the Crew Member.<br><br>
+          The Crew Member agrees to keep all production details, creative direction, and client information strictly confidential during and after the production period ending April 30, 2026.<br><br>
+          This includes but is not limited to: shoot locations, unreleased music, artist involvement, and production budget.
+        </p>
+        <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Your Signature</p>
+        <div class="nda-sig-box" id="nda-unsigned" onclick="signNDA()">
+          <div style="font-size:24px;margin-bottom:6px;">✍️</div>
+          <div style="font-size:13px;font-weight:600;color:var(--muted);">Tap to sign</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Draw or type your signature</div>
+        </div>
+        <div class="nda-sig-done" id="nda-signed" style="display:none;">
+          <span style="color:var(--teal);font-size:20px;">✓</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);" id="nda-sig-name">Signed</div>
+            <div style="font-size:11px;color:var(--muted);">Today, <span id="nda-sig-date"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rate summary -->
+      <div class="card" style="padding:0 18px;">
+        <div class="info-row"><span class="info-key">Agreed Rate</span><span class="info-val" style="color:var(--orange);">$850 / day</span></div>
+        <div class="info-row"><span class="info-key">Total (5 days)</span><span class="info-val">$4,250</span></div>
+        <div class="info-row"><span class="info-key">Payment via</span><span class="info-val">Visianary Payout</span></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo(5,document.querySelectorAll('.dev-btn')[5])" style="margin-bottom:10px;">Sign &amp; Confirm →</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);line-height:1.5;">By signing you agree to the terms above and the Visianary <a href="#" style="color:var(--orange);font-weight:700;text-decoration:none;">Terms of Service</a>.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ SCREEN 5 — YOU'RE BOOKED! (invited path) ══════════════════ -->
+<div class="screen" id="s5">
+<div class="phone">
+  <div class="notch"></div>
+  <!-- Header -->
+  <div class="app-header">
+    <span class="logo">visianary</span>
+    <div class="avatar-circle" id="s5-avatar">JS</div>
+  </div>
+  <div class="phone-content">
+    <!-- Orange hero -->
+    <div class="orange-hero">
+      <div style="font-size:56px;margin-bottom:12px;">🎬</div>
+      <div class="display" style="font-size:32px;color:#fff;margin-bottom:6px;letter-spacing:1px;">YOU'RE BOOKED!</div>
+      <p style="font-size:14px;color:rgba(255,255,255,0.85);">NDA signed · Rate locked in · You're on the crew.</p>
+    </div>
+
+    <div class="pad">
+      <!-- Job confirmation card -->
+      <div class="card-white" style="border-color:rgba(242,92,5,0.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:16px;font-weight:800;color:var(--text);">Urban Pulse</span>
+          <span class="badge badge-confirmed">CONFIRMED</span>
+        </div>
+        <div class="info-row"><span class="info-key">📅 Dates</span><span class="info-val">Apr 14–18, 2026</span></div>
+        <div class="info-row"><span class="info-key">📍 Location</span><span class="info-val">Downtown LA</span></div>
+        <div class="info-row"><span class="info-key">🎚️ Role</span><span class="info-val">Gaffer</span></div>
+        <div class="info-row"><span class="info-key">💰 Rate</span><span class="info-val" style="color:var(--orange);">$850/day · $4,250 total</span></div>
+        <div class="info-row"><span class="info-key">Producer</span><span class="info-val">Linda Kim</span></div>
+      </div>
+
+      <!-- What's next -->
+      <div class="alert alert-green">
+        <div class="alert-icon">📋</div>
+        <p><strong>Call Sheet incoming</strong> — Linda will send the full call sheet 24–48 hrs before the shoot. Keep an eye on your SMS.</p>
+      </div>
+
+      <div class="alert alert-yellow">
+        <div class="alert-icon">💳</div>
+        <p><strong>Set up payout</strong> — Add your bank info to receive $4,250 after the shoot. <a href="#" style="color:var(--orange);font-weight:700;text-decoration:none;">Do it now →</a></p>
+      </div>
+
+      <!-- CTA — changed from "View in My Gigs" -->
+      <button class="btn btn-primary" onclick="goTo(6,document.querySelectorAll('.dev-btn')[6])" style="margin-bottom:10px;">
+        Finish Setting Up My Profile →
+      </button>
+      <button class="btn btn-outline" style="margin-bottom:4px;">
+        Set Up Payout
+      </button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><div class="nav-icon">📁</div>Portfolio</div>
+    <div class="nav-item active"><div class="nav-icon">💼</div>My Gigs</div>
+    <div class="nav-item"><div class="nav-icon">💰</div>Payout</div>
+    <div class="nav-item"><div class="nav-icon">💬</div>Messages</div>
+    <div class="nav-item"><div class="nav-icon">⚙️</div>Settings</div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ SCREEN 6 — PROFILE LANDING ════════════════════════════════ -->
+<div class="screen" id="s6">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <span class="logo">visianary</span>
+    <div style="display:flex;align-items:center;gap:18px;">
+      <span style="font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;">Gigs</span>
+      <span style="font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;">Messages</span>
+      <span style="font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;">Payout</span>
+      <div class="avatar-circle" id="dash-avatar">VU</div>
+    </div>
+  </div>
+
+  <div class="phone-content">
+    <div class="pad">
+
+      <!-- Welcome -->
+      <div style="margin-bottom:20px;">
+        <div class="display" style="font-size:26px;letter-spacing:1px;margin-bottom:4px;">WELCOME, <span id="dash-name">CREW MEMBER</span>!</div>
+        <p style="font-size:13px;color:var(--teal);font-weight:700;">✓ Your profile is live</p>
+      </div>
+
+      <!-- Profile card -->
+      <div class="card-white" style="margin-bottom:12px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+          <div class="profile-avatar" id="dash-big-avatar" style="position:relative;cursor:pointer;" onclick="mockAddPhoto()">
+            <span id="dash-initials">VU</span>
+            <div id="photo-overlay" style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-family:'Manrope',sans-serif;font-weight:700;">📷</div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <p style="font-weight:800;font-size:15px;margin-bottom:2px;" id="dash-displayname">Crew Member</p>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:2px;" id="dash-headline-txt"></p>
+            <p style="font-size:12px;color:var(--muted);" id="dash-loc-txt"></p>
+          </div>
+        </div>
+        <div id="dash-skills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:12px;color:var(--muted);font-weight:600;">Profile completion</span>
+          <span style="font-size:12px;font-weight:800;" id="dash-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="dash-bar" style="width:0%;background:var(--yellow);"></div></div>
+      </div>
+
+      <!-- Action prompts -->
+      <p style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Complete your profile</p>
+
+      <div class="action-card" id="ac-photo" onclick="mockAddPhoto()">
+        <div class="action-icon-wrap" style="background:rgba(5,162,215,0.08);">📸</div>
+        <div style="flex:1;">
+          <div class="action-title">Add Profile Photo</div>
+          <div class="action-sub">Producers want to see who they're hiring</div>
+        </div>
+        <div class="action-arrow">›</div>
+      </div>
+
+      <div class="action-card" id="ac-bank" onclick="mockAddBank()">
+        <div class="action-icon-wrap" style="background:rgba(0,154,132,0.08);">🏦</div>
+        <div style="flex:1;">
+          <div class="action-title">Add Bank Details</div>
+          <div class="action-sub">So you can get paid after every shoot</div>
+        </div>
+        <div class="action-arrow">›</div>
+      </div>
+
+      <div class="action-card" id="ac-w9" onclick="mockCompleteW9()" style="display:none;">
+        <div class="action-icon-wrap" style="background:rgba(241,189,0,0.1);">📄</div>
+        <div style="flex:1;">
+          <div class="action-title">Upload W-9 &amp; Compliance</div>
+          <div class="action-sub">Required to browse all gigs</div>
+        </div>
+        <div class="action-arrow" style="color:var(--yellow);">!</div>
+      </div>
+
+      <!-- Network section -->
+      <div class="card-white" style="margin-top:4px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <p style="font-size:14px;font-weight:800;color:var(--text);">👥 Your Network on Visianary</p>
+          <a href="#" style="font-size:12px;color:var(--orange);font-weight:700;text-decoration:none;">See all →</a>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:500;">Colleagues and contacts already on the platform</p>
+        <div class="network-row">
+          <div class="network-chip"><div class="n-avatar" style="background:#05A2D7;">MK</div><div class="n-name">Marcus K.</div></div>
+          <div class="network-chip"><div class="n-avatar" style="background:#009A84;">JL</div><div class="n-name">Jamie L.</div></div>
+          <div class="network-chip"><div class="n-avatar" style="background:#F1BD00;color:var(--text);">TR</div><div class="n-name">Tara R.</div></div>
+          <div class="network-chip"><div class="n-avatar" style="background:#E24B4A;">DS</div><div class="n-name">Dev S.</div></div>
+          <div class="network-chip"><div class="n-avatar" style="background:#6B5CFF;">PH</div><div class="n-name">Pablo H.</div></div>
+          <div class="network-chip" style="opacity:.5;"><div class="n-avatar" style="background:var(--muted);">+12</div><div class="n-name">more</div></div>
+        </div>
+      </div>
+
+      <!-- Browse Gigs CTA or invited-only notice -->
+      <div id="invited-only-notice" class="alert alert-yellow" style="display:none;">
+        <div class="alert-icon">🔒</div>
+        <div>
+          <p><strong>Limited access</strong> — You can view your invited gig but browsing the full marketplace requires completing your W-9 &amp; compliance.</p>
+          <p class="sub" style="margin-top:4px;"><a href="#" onclick="goTo(2,document.querySelectorAll('.dev-btn')[2])" style="color:var(--orange);font-weight:700;text-decoration:none;">Complete compliance →</a></p>
+        </div>
+      </div>
+
+      <div id="browse-gigs-cta" class="gig-cta">
+        <div>
+          <div class="display" style="font-size:22px;color:#fff;letter-spacing:1px;margin-bottom:2px;">BROWSE GIGS</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.8);font-weight:600;">Find your next production job</div>
+        </div>
+        <span style="font-size:36px;">🎬</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item"><div class="nav-icon">📁</div>Portfolio</div>
+    <div class="nav-item"><div class="nav-icon">💼</div>My Gigs</div>
+    <div class="nav-item"><div class="nav-icon">💰</div>Payout</div>
+    <div class="nav-item"><div class="nav-icon">💬</div>Messages</div>
+    <div class="nav-item active"><div class="nav-icon">⚙️</div>Profile</div>
+  </div>
+</div>
+</div>
+
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+const state = {
+  path: 'invited',   // 'invited' | 'organic'
+  w9Done: false,
+  complianceDone: false,
+  skills: [],
+  photoAdded: false,
+  bankAdded: false,
+}
+
+// ── Path toggle ─────────────────────────────────────────────────
+function setPath(p) {
+  state.path = p
+  document.getElementById('path-invited').classList.toggle('active', p === 'invited')
+  document.getElementById('path-organic').classList.toggle('active', p === 'organic')
+}
+
+// ── Navigation ──────────────────────────────────────────────────
+function goTo(idx, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.dev-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById('s' + idx).classList.add('active')
+  if (btn) btn.classList.add('active')
+  window.scrollTo(0, 0)
+  if (idx === 6) refreshDashboard()
+}
+
+// ── S1 → S2 ─────────────────────────────────────────────────────
+function goToS2() {
+  const pw  = document.getElementById('s1-pw').value
+  const cpw = document.getElementById('s1-cpw').value
+  const hint = document.getElementById('pw-hint')
+  if (pw && cpw && pw !== cpw) {
+    hint.style.display = 'block'
+    document.getElementById('s1-cpw').style.borderColor = 'var(--red)'
+    return
+  }
+  hint.style.display = 'none'
+  document.getElementById('s1-cpw').style.borderColor = ''
+  goTo(2, document.querySelectorAll('.dev-btn')[2])
+}
+
+// ── S3 → branch ─────────────────────────────────────────────────
+function afterSkills() {
+  if (state.path === 'invited') {
+    goTo(4, document.querySelectorAll('.dev-btn')[4])
+  } else {
+    goTo(6, document.querySelectorAll('.dev-btn')[6])
+  }
+}
+
+// ── Password toggle ──────────────────────────────────────────────
+function togglePw(id, btn) {
+  const el = document.getElementById(id)
+  el.type = el.type === 'password' ? 'text' : 'password'
+  btn.textContent = el.type === 'password' ? 'SHOW' : 'HIDE'
+}
+
+// ── Segmented select ─────────────────────────────────────────────
+function pickSeg(btn, groupId) {
+  document.querySelectorAll('#' + groupId + ' .seg-btn').forEach(b => b.classList.remove('selected'))
+  btn.classList.add('selected')
+}
+
+// ── Skill categories accordion ───────────────────────────────────
+function toggleCat(cat) {
+  const card = document.getElementById('cat-' + cat)
+  const acc  = document.getElementById('acc-' + cat)
+  card.classList.toggle('selected')
+  acc.classList.toggle('open')
+}
+
+// ── Skill chips ──────────────────────────────────────────────────
+function toggleChip(btn, cat) {
+  btn.classList.toggle('selected')
+  const catChips = document.querySelectorAll('#acc-' + cat + ' .chip.selected')
+  document.getElementById('acc-' + cat + '-ct').textContent = catChips.length + ' selected'
+  state.skills = Array.from(document.querySelectorAll('.chip.selected')).map(b => b.textContent)
+  const total = state.skills.length
+  const bar = document.getElementById('skills-count-bar')
+  if (total > 0) {
+    bar.style.display = 'flex'
+    document.getElementById('skills-count-txt').textContent = total + ' skill' + (total !== 1 ? 's' : '') + ' selected'
+  } else {
+    bar.style.display = 'none'
+  }
+}
+
+// ── Socials toggle ───────────────────────────────────────────────
+function toggleSocials() {
+  const panel = document.getElementById('socials-panel')
+  const arrow = document.getElementById('socials-arrow')
+  const open = panel.style.display === 'block'
+  panel.style.display = open ? 'none' : 'block'
+  arrow.textContent = open ? '▸' : '▾'
+}
+
+// ── Checkbox toggle ──────────────────────────────────────────────
+function toggleCheck(el) {
+  el.classList.toggle('checked')
+}
+
+// ── W-9 upload mock ──────────────────────────────────────────────
+function mockW9Upload() {
+  state.w9Done = true
+  document.getElementById('w9-zone').style.display = 'none'
+  document.getElementById('w9-done').style.display = 'flex'
+}
+
+// ── NDA sign mock ────────────────────────────────────────────────
+function signNDA() {
+  const name = document.getElementById('s1-preferred').value || document.getElementById('s1-fullname').value || 'Crew Member'
+  document.getElementById('nda-unsigned').style.display = 'none'
+  document.getElementById('nda-signed').style.display = 'flex'
+  document.getElementById('nda-sig-name').textContent = name
+  document.getElementById('nda-sig-date').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+// ── Dashboard mocks ──────────────────────────────────────────────
+function mockAddPhoto() {
+  state.photoAdded = true
+  const overlay = document.getElementById('photo-overlay')
+  if (overlay) overlay.style.display = 'none'
+  document.getElementById('ac-photo').classList.add('done')
+  document.getElementById('ac-photo').querySelector('.action-arrow').textContent = '✓'
+  document.getElementById('ac-photo').querySelector('.action-arrow').style.color = 'var(--teal)'
+  refreshDashboard()
+}
+function mockAddBank() {
+  state.bankAdded = true
+  document.getElementById('ac-bank').classList.add('done')
+  document.getElementById('ac-bank').querySelector('.action-arrow').textContent = '✓'
+  document.getElementById('ac-bank').querySelector('.action-arrow').style.color = 'var(--teal)'
+  refreshDashboard()
+}
+function mockCompleteW9() {
+  state.w9Done = true
+  document.getElementById('ac-w9').style.display = 'none'
+  document.getElementById('invited-only-notice').style.display = 'none'
+  document.getElementById('browse-gigs-cta').style.display = 'flex'
+  refreshDashboard()
+}
+
+// ── Dashboard refresh ────────────────────────────────────────────
+function refreshDashboard() {
+  const name = document.getElementById('s1-preferred').value ||
+               document.getElementById('s1-fullname').value || 'Crew Member'
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'VU'
+  const headline = document.getElementById('s1-headline').value
+  const location = document.getElementById('s1-loc').value
+
+  document.getElementById('dash-name').textContent = name.toUpperCase()
+  document.getElementById('dash-displayname').textContent = name
+  document.getElementById('dash-initials').textContent = initials
+  document.getElementById('dash-avatar').textContent = initials
+  document.getElementById('s5-avatar').textContent = initials
+  document.getElementById('dash-headline-txt').textContent = headline
+  document.getElementById('dash-loc-txt').textContent = location ? '📍 ' + location : ''
+
+  // Skills
+  const el = document.getElementById('dash-skills')
+  el.innerHTML = ''
+  state.skills.slice(0, 5).forEach(s => {
+    const t = document.createElement('span'); t.className = 'skill-tag'; t.textContent = s; el.appendChild(t)
+  })
+  if (state.skills.length > 5) {
+    const m = document.createElement('span')
+    m.className = 'skill-tag'
+    m.style.cssText = 'background:rgba(10,14,18,0.05);border-color:rgba(10,14,18,0.1);color:var(--muted)'
+    m.textContent = '+' + (state.skills.length - 5) + ' more'
+    el.appendChild(m)
+  }
+
+  // Completion
+  let pts = 0
+  if (document.getElementById('s1-fullname').value) pts += 12
+  if (document.getElementById('s1-email').value)    pts += 10
+  if (headline)                                       pts += 10
+  if (location)                                       pts += 8
+  if (state.skills.length > 0)                        pts += 15
+  if (state.w9Done)                                   pts += 15
+  if (state.photoAdded)                               pts += 15
+  if (state.bankAdded)                                pts += 15
+  const pct = Math.min(pts, 100)
+  const color = pct >= 80 ? 'var(--teal)' : pct >= 50 ? 'var(--orange)' : 'var(--yellow)'
+  document.getElementById('dash-pct').textContent = pct + '%'
+  document.getElementById('dash-pct').style.color = color
+  document.getElementById('dash-bar').style.cssText = `width:${pct}%;background:${color}`
+
+  // W-9 prompt for organic path if skipped
+  const w9Card = document.getElementById('ac-w9')
+  const invitedNotice = document.getElementById('invited-only-notice')
+  const browseCta = document.getElementById('browse-gigs-cta')
+  if (!state.w9Done) {
+    w9Card.style.display = 'flex'
+    if (state.path === 'invited' && !state.w9Done) {
+      invitedNotice.style.display = 'flex'
+      browseCta.style.display = 'none'
+    } else if (state.path === 'organic') {
+      invitedNotice.style.display = 'flex'
+      browseCta.style.display = 'none'
+    }
+  } else {
+    w9Card.style.display = 'none'
+    invitedNotice.style.display = 'none'
+    browseCta.style.display = 'flex'
+  }
+}
+
+// ── URL deep-link (?screen=N) ────────────────────────────────────
+;(function() {
+  const p = new URLSearchParams(window.location.search).get('screen')
+  if (p !== null) {
+    const idx = Math.min(Math.max(parseInt(p) || 0, 0), 6)
+    goTo(idx, document.querySelectorAll('.dev-btn')[idx])
+  }
+})()
+</script>
+</body>
+</html>
