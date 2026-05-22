@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visianary — Crew Confirmation Flow (Mobile)</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #E8F4F8;
+  --surface: #F1F6F7;
+  --card: #F5F9FA;
+  --white: #FFFFFF;
+  --orange: #F25C05;
+  --teal: #009A84;
+  --yellow: #F1BD00;
+  --red: #E24B4A;
+  --blue: #05A2D7;
+  --muted: #8A9BAE;
+  --text: #0A0E12;
+  --border: rgba(10,14,18,0.08);
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px 24px 48px;
+}
+
+/* ── Screen Navigator ── */
+.nav-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+.nav-label {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 18px; color: var(--orange);
+  letter-spacing: 2px; margin-right: 8px;
+}
+.nav-btn {
+  padding: 7px 14px;
+  border: 1.5px solid rgba(5,162,215,0.3);
+  border-radius: 100px;
+  background: rgba(255,255,255,0.7);
+  color: rgba(5,162,215,0.8);
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.nav-btn:hover { border-color: var(--blue); color: var(--blue); }
+.nav-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+/* ── Screen wrapper ── */
+.screen { display: none; }
+.screen.active { display: flex; justify-content: center; }
+
+/* ── Phone shell ── */
+.phone {
+  width: 390px;
+  min-height: 844px;
+  background: var(--surface);
+  border-radius: 48px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(5,162,215,0.15), 0 8px 32px rgba(0,0,0,0.12);
+  border: 8px solid #1A2530;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Notch */
+.notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 126px; height: 34px;
+  background: #1A2530;
+  border-radius: 0 0 20px 20px;
+  z-index: 10;
+}
+
+/* ── Top header ── */
+.app-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 52px 20px 12px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.logo { font-family: 'Bebas Neue', cursive; font-size: 22px; color: var(--orange); letter-spacing: 2px; }
+.avatar-circle {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', cursive; font-size: 13px; color: #fff; letter-spacing: 1px;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  cursor: pointer;
+}
+
+/* ── Scrollable content ── */
+.phone-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 80px;
+}
+.phone-content::-webkit-scrollbar { display: none; }
+
+/* ── Bottom Nav ── */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 75px;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+  justify-content: space-around;
+  padding-top: 10px;
+  z-index: 5;
+}
+.nav-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 600; color: var(--muted);
+  cursor: pointer;
+}
+.nav-item.active { color: var(--orange); }
+.nav-icon { font-size: 20px; line-height: 1.4; }
+
+/* ── Sections ── */
+.section-pad { padding: 20px; }
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* ── Typography ── */
+.display { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+.h1 { font-size: 28px; line-height: 1.15; color: var(--text); }
+.h2 { font-size: 22px; line-height: 1.15; color: var(--text); }
+.h3 { font-size: 16px; font-weight: 800; color: var(--text); }
+.label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.body { font-size: 13px; font-weight: 400; color: var(--muted); line-height: 1.5; }
+.body-dark { font-size: 13px; font-weight: 500; color: var(--text); }
+
+/* ── Buttons ── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 20px; border-radius: 10px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; border: none; width: 100%;
+  transition: all 0.15s; text-align: center;
+}
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-teal { background: var(--teal); color: #fff; }
+.btn-sm { padding: 10px 16px; font-size: 13px; border-radius: 8px; }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; }
+.btn-row .btn { flex: 1; }
+
+/* ── Status badges ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: 100px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+}
+.badge-confirmed { background: rgba(0,154,132,0.1); color: var(--teal); }
+.badge-pending { background: rgba(241,189,0,0.12); color: #B38D00; }
+.badge-hold { background: rgba(5,162,215,0.1); color: var(--blue); }
+.badge-booked { background: rgba(242,92,5,0.1); color: var(--orange); }
+
+/* ── Info rows ── */
+.info-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.info-row:last-child { border-bottom: none; }
+.info-key { font-size: 12px; font-weight: 600; color: var(--muted); }
+.info-val { font-size: 13px; font-weight: 700; color: var(--text); text-align: right; }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* ── Progress ── */
+.progress-track {
+  height: 6px; background: var(--border);
+  border-radius: 3px; overflow: hidden; margin: 6px 0;
+}
+.progress-fill { height: 100%; border-radius: 3px; background: var(--orange); }
+
+/* ── Producer card ── */
+.producer-chip {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+.prod-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', cursive; font-size: 16px; color: #fff; letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.prod-name { font-size: 14px; font-weight: 800; }
+.prod-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ── SMS mockup ── */
+.sms-screen {
+  background: #1C1C1E;
+  min-height: 100%;
+  padding: 60px 0 80px;
+  display: flex; flex-direction: column;
+}
+.sms-header-bar {
+  background: #1C1C1E;
+  padding: 8px 20px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 20px;
+}
+.sms-contact { font-size: 17px; font-weight: 700; color: #fff; }
+.sms-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.sms-bubbles { padding: 0 16px; flex: 1; }
+.sms-time { text-align: center; font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 16px; font-weight: 500; }
+.bubble-wrap { display: flex; margin-bottom: 12px; }
+.bubble-wrap.incoming { justify-content: flex-start; }
+.bubble-wrap.outgoing { justify-content: flex-end; }
+.bubble {
+  max-width: 76%;
+  padding: 11px 14px;
+  border-radius: 18px;
+  font-size: 14px; line-height: 1.45; font-family: -apple-system, sans-serif;
+}
+.bubble.incoming { background: #3A3A3C; color: #fff; border-bottom-left-radius: 4px; }
+.bubble.outgoing { background: #0A84FF; color: #fff; border-bottom-right-radius: 4px; }
+.bubble .link { color: #64D2FF; text-decoration: underline; font-weight: 600; }
+.sms-input-bar {
+  margin: 16px 16px 0;
+  display: flex; gap: 8px; align-items: center;
+  background: #2C2C2E;
+  border-radius: 22px;
+  padding: 10px 14px;
+}
+.sms-input-text { flex: 1; font-size: 15px; color: rgba(255,255,255,0.3); font-family: -apple-system, sans-serif; }
+.sms-send { font-size: 22px; }
+
+/* ── Success screen ── */
+.success-hero {
+  background: linear-gradient(160deg, rgba(0,154,132,0.08) 0%, rgba(5,162,215,0.04) 100%);
+  padding: 32px 20px 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.success-icon { font-size: 56px; margin-bottom: 12px; }
+
+/* ── NDA doc ── */
+.nda-doc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.nda-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.nda-icon { font-size: 28px; }
+.nda-title { font-size: 14px; font-weight: 800; }
+.nda-sub { font-size: 11px; color: var(--muted); }
+.nda-body { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+.nda-sig-box {
+  border: 1.5px dashed rgba(10,14,18,0.2);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+.nda-sig-done {
+  border: 1.5px solid var(--teal);
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(0,154,132,0.04);
+}
+
+/* ── Gig card ── */
+.gig-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex; gap: 14px;
+}
+.gig-color-bar { width: 4px; border-radius: 2px; flex-shrink: 0; }
+.gig-info { flex: 1; }
+.gig-title { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+.gig-meta { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.gig-footer { display: flex; align-items: center; justify-content: space-between; }
+.gig-rate { font-size: 13px; font-weight: 700; }
+
+/* ── Alert banner ── */
+.alert-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+.alert-yellow { background: rgba(241,189,0,0.1); border: 1px solid rgba(241,189,0,0.25); }
+.alert-teal { background: rgba(0,154,132,0.08); border: 1px solid rgba(0,154,132,0.2); }
+.alert-orange { background: rgba(242,92,5,0.08); border: 1px solid rgba(242,92,5,0.2); }
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert-text { font-size: 12px; font-weight: 600; line-height: 1.5; }
+.alert-text strong { font-weight: 800; color: var(--text); }
+
+/* Timeline */
+.timeline { padding: 0 20px; }
+.t-item { display: flex; gap: 14px; padding-bottom: 20px; }
+.t-left { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.t-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.t-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; min-height: 20px; }
+.t-content { flex: 1; padding-bottom: 4px; }
+.t-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.t-sub { font-size: 11px; color: var(--muted); }
+
+/* Section with orange header */
+.orange-header {
+  background: var(--orange);
+  padding: 20px;
+  color: #fff;
+  margin-bottom: 0;
+}
+
+/* Stepper dots */
+.stepper { display: flex; gap: 6px; align-items: center; padding: 16px 20px 0; }
+.step-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--border); }
+.step-dot.done { background: var(--teal); }
+.step-dot.active { width: 20px; background: var(--orange); }
+</style>
+</head>
+<body>
+
+<!-- ── Navigator ── -->
+<div class="nav-bar">
+  <div class="nav-label">VISIANARY · CREW</div>
+  <button class="nav-btn active" onclick="show(0,this)">1 · SMS Invite</button>
+  <button class="nav-btn" onclick="show(1,this)">2 · Job Details</button>
+  <button class="nav-btn" onclick="show(2,this)">3 · Confirm + Profile</button>
+  <button class="nav-btn" onclick="show(3,this)">4 · On Hold</button>
+  <button class="nav-btn" onclick="show(4,this)">5 · NDA Received</button>
+  <button class="nav-btn" onclick="show(5,this)">6 · Sign NDA</button>
+  <button class="nav-btn" onclick="show(6,this)">7 · You're Booked!</button>
+  <button class="nav-btn" onclick="show(7,this)">8 · My Gigs</button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 1 — SMS INVITE
+     ══════════════════════════════════════════════ -->
+<div class="screen active" id="s0">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="sms-screen" style="flex:1">
+    <div style="padding:8px 20px 0;display:flex;align-items:center;gap:16px">
+      <span style="color:rgba(255,255,255,0.5);font-size:13px">◁</span>
+      <div style="flex:1;text-align:center">
+        <div class="sms-contact">Visianary</div>
+        <div class="sms-sub">Film Crew Marketplace</div>
+      </div>
+      <span style="font-size:18px">📞</span>
+    </div>
+
+    <div style="height:24px"></div>
+
+    <div class="sms-bubbles">
+      <div class="sms-time">Today, 10:14 AM</div>
+
+      <div class="bubble-wrap incoming">
+        <div class="bubble incoming">
+          Hey John 👋 You've been invited to a shoot by producer <strong>Linda Kim</strong>.
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="bubble-wrap incoming">
+        <div class="bubble incoming">
+          <strong>Urban Pulse</strong> · Music Video<br>
+          📅 Apr 14–18, 2026 · Downtown LA<br>
+          🎚️ Gaffer · $850/day
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="bubble-wrap incoming">
+        <div class="bubble incoming">
+          Tap to view details and confirm your availability:<br><br>
+          <span class="link">visianary.app/invite/js-4821</span>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+      <div class="sms-time">10:16 AM</div>
+      <div class="bubble-wrap outgoing">
+        <div class="bubble outgoing">
+          sounds good, checking it out 👍
+        </div>
+      </div>
+    </div>
+
+    <div class="sms-input-bar">
+      <div class="sms-input-text">iMessage</div>
+      <div class="sms-send">🎤</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 2 — JOB DETAILS
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s1">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <div class="back-btn">← Back</div>
+    <div class="logo">visianary</div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="phone-content">
+    <div class="section-pad">
+      <!-- Producer sent this -->
+      <div class="label" style="margin-bottom:10px">Invite from</div>
+      <div class="producer-chip">
+        <div class="prod-avatar">LK</div>
+        <div>
+          <div class="prod-name">Linda Kim</div>
+          <div class="prod-sub">Producer · Verified ✓</div>
+        </div>
+        <div style="margin-left:auto">
+          <div class="badge badge-booked">INVITE</div>
+        </div>
+      </div>
+
+      <!-- Production title -->
+      <div style="margin-bottom:16px">
+        <div class="display h1" style="margin-bottom:4px">URBAN PULSE</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="badge badge-confirmed">MUSIC VIDEO</div>
+          <span class="body">5 days · LA</span>
+        </div>
+      </div>
+
+      <!-- Key info card -->
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+        <div style="padding:14px 16px">
+          <div class="info-row">
+            <div class="info-key">📅 Dates</div>
+            <div class="info-val">Apr 14–18, 2026</div>
+          </div>
+          <div class="info-row">
+            <div class="info-key">📍 Location</div>
+            <div class="info-val">Downtown LA<br><span style="font-size:11px;color:var(--muted)">Arts District</span></div>
+          </div>
+          <div class="info-row">
+            <div class="info-key">🎚️ Your Role</div>
+            <div class="info-val">Gaffer<br><span style="font-size:11px;color:var(--muted)">Lighting Dept</span></div>
+          </div>
+          <div class="info-row">
+            <div class="info-key">💰 Rate</div>
+            <div class="info-val" style="color:var(--orange)">$850 / day</div>
+          </div>
+          <div class="info-row">
+            <div class="info-key">🎬 Crew Size</div>
+            <div class="info-val">~12 crew</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project brief -->
+      <div class="card">
+        <div class="h3" style="margin-bottom:8px">Project Brief</div>
+        <div class="body">Gritty urban aesthetic, documentary-feel. Night shoots likely. Client is Neon Records. Two camera setups running simultaneously. Looking for experienced gaffer comfortable in low-light environments.</div>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert-banner alert-yellow">
+        <div class="alert-icon">⏳</div>
+        <div class="alert-text"><strong>Respond by Apr 12</strong> · Linda needs to confirm crew 2 days before the shoot.</div>
+      </div>
+
+      <!-- CTAs -->
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="show(1, document.querySelectorAll('.nav-btn')[1])">Not Available</button>
+        <button class="btn btn-orange" onclick="show(2, document.querySelectorAll('.nav-btn')[2])">I'm Interested →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 3 — CONFIRM + AUTO PROFILE CTA
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s2">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <div class="logo">visianary</div>
+    <div class="avatar-circle">JS</div>
+  </div>
+  <div class="phone-content">
+    <!-- Success header -->
+    <div class="success-hero">
+      <div class="success-icon">✅</div>
+      <div class="display h2" style="margin-bottom:6px">YOU'RE INTERESTED!</div>
+      <div class="body" style="color:var(--muted)">Linda Kim has been notified. Your spot is being held.</div>
+    </div>
+
+    <div class="section-pad">
+      <!-- Status timeline -->
+      <div class="h3" style="margin-bottom:16px">What happens next</div>
+      <div class="timeline" style="padding:0">
+        <div class="t-item">
+          <div class="t-left"><div class="t-dot" style="background:var(--teal)"></div><div class="t-line"></div></div>
+          <div class="t-content"><div class="t-title">You confirmed interest ✓</div><div class="t-sub">Right now</div></div>
+        </div>
+        <div class="t-item">
+          <div class="t-left"><div class="t-dot" style="background:var(--orange)"></div><div class="t-line"></div></div>
+          <div class="t-content"><div class="t-title">Linda reviews & selects crew</div><div class="t-sub">Within 24–48 hours</div></div>
+        </div>
+        <div class="t-item">
+          <div class="t-left"><div class="t-dot" style="background:var(--muted)"></div><div class="t-line"></div></div>
+          <div class="t-content"><div class="t-title">If selected — NDA to sign</div><div class="t-sub">You'll get an SMS</div></div>
+        </div>
+        <div class="t-item">
+          <div class="t-left"><div class="t-dot" style="background:var(--muted)"></div></div>
+          <div class="t-content"><div class="t-title">Booking confirmed + Call Sheet</div><div class="t-sub">Rate locked in 🎬</div></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Auto-profile notice -->
+      <div class="alert-banner alert-orange">
+        <div class="alert-icon">🎉</div>
+        <div class="alert-text"><strong>Welcome to Visianary, John!</strong> We've created a basic profile for you automatically. Add a few details to stand out to producers.</div>
+      </div>
+
+      <!-- Profile card -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="prod-avatar" style="background:var(--orange);width:48px;height:48px;font-size:16px">JS</div>
+          <div>
+            <div class="h3">John Smith</div>
+            <div class="body">Gaffer · Lighting</div>
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span class="label">Profile completion</span>
+          <span style="font-size:12px;font-weight:700;color:var(--yellow)">20%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:20%;background:var(--yellow)"></div></div>
+        <div class="body" style="margin-top:8px;margin-bottom:14px">Add your photo, rate, and bio to get discovered by more producers.</div>
+        <button class="btn btn-orange btn-sm">Complete My Profile →</button>
+      </div>
+
+      <button class="btn btn-ghost" onclick="show(3, document.querySelectorAll('.nav-btn')[3])" style="margin-top:4px">Skip for now</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 4 — ON HOLD
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s3">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <div class="logo">visianary</div>
+    <div class="avatar-circle">JS</div>
+  </div>
+  <div class="phone-content">
+    <!-- Header -->
+    <div class="orange-header">
+      <div class="label" style="color:rgba(255,255,255,0.6);margin-bottom:6px">Urban Pulse · Apr 14–18</div>
+      <div class="display h2" style="color:#fff;margin-bottom:4px">YOUR SPOT IS HELD</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8)">Linda is finalizing the crew roster.</div>
+    </div>
+
+    <div class="section-pad">
+      <!-- Status card -->
+      <div class="card" style="text-align:center;padding:24px 16px">
+        <div style="font-size:40px;margin-bottom:10px">⏸️</div>
+        <div class="badge badge-hold" style="margin-bottom:8px">ON HOLD</div>
+        <div class="h3" style="margin-bottom:6px">Awaiting Producer Selection</div>
+        <div class="body">Linda Kim is reviewing all crew responses. You'll hear back within 24–48 hours.</div>
+      </div>
+
+      <!-- Your invite summary -->
+      <div class="label" style="margin-bottom:10px">Your Invite Summary</div>
+      <div class="card">
+        <div class="info-row">
+          <div class="info-key">Production</div>
+          <div class="info-val">Urban Pulse</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Role</div>
+          <div class="info-val">Gaffer</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Rate</div>
+          <div class="info-val" style="color:var(--orange)">$850 / day</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Status</div>
+          <div class="info-val"><div class="badge badge-hold">HOLD</div></div>
+        </div>
+      </div>
+
+      <!-- Accountability note -->
+      <div class="alert-banner alert-yellow">
+        <div class="alert-icon">📌</div>
+        <div class="alert-text"><strong>Hold commitment:</strong> If selected and you cancel within 24 hrs of the shoot, it may affect your ranking on future gigs.</div>
+      </div>
+
+      <button class="btn btn-ghost" style="color:var(--red);border-color:var(--red);margin-top:4px">Withdraw Availability</button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><div class="nav-icon">📁</div>Portfolio</div>
+    <div class="nav-item active"><div class="nav-icon">💼</div>My Gigs</div>
+    <div class="nav-item"><div class="nav-icon">💰</div>Payout</div>
+    <div class="nav-item"><div class="nav-icon">💬</div>Messages</div>
+    <div class="nav-item"><div class="nav-icon">⚙️</div>Settings</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 5 — NDA RECEIVED (SMS)
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s4">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="sms-screen" style="flex:1">
+    <div style="padding:8px 20px 0;display:flex;align-items:center;gap:16px">
+      <span style="color:rgba(255,255,255,0.5);font-size:13px">◁</span>
+      <div style="flex:1;text-align:center">
+        <div class="sms-contact">Visianary</div>
+        <div class="sms-sub">Film Crew Marketplace</div>
+      </div>
+      <span style="font-size:18px">📞</span>
+    </div>
+
+    <div style="height:24px"></div>
+
+    <div class="sms-bubbles">
+      <div class="sms-time">Yesterday, 10:14 AM</div>
+      <div class="bubble-wrap incoming">
+        <div class="bubble incoming">Hey John 👋 You've been invited to a shoot by producer <strong>Linda Kim</strong>.</div>
+      </div>
+      <div style="height:6px"></div>
+      <div class="bubble-wrap incoming">
+        <div class="bubble incoming"><span class="link">visianary.app/invite/js-4821</span></div>
+      </div>
+      <div style="height:6px"></div>
+      <div class="bubble-wrap outgoing">
+        <div class="bubble outgoing">sounds good, checking it out 👍</div>
+      </div>
+
+      <div style="height:20px"></div>
+      <div class="sms-time">Today, 9:02 AM</div>
+      <div class="bubble-wrap incoming">
+        <div class="bubble incoming">
+          🎉 <strong>Great news, John!</strong><br><br>
+          Linda Kim has selected you for <strong>Urban Pulse</strong>.<br><br>
+          Before we lock you in, please sign the NDA:<br><br>
+          <span class="link">visianary.app/nda/js-4821</span><br><br>
+          ⏰ Deadline: <strong>Apr 12 by 5 PM</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="sms-input-bar">
+      <div class="sms-input-text">iMessage</div>
+      <div class="sms-send">🎤</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 6 — SIGN NDA
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s5">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <div class="back-btn">← Back</div>
+    <div class="logo">visianary</div>
+    <div style="width:32px"></div>
+  </div>
+  <div class="phone-content">
+    <div class="section-pad">
+      <div class="display h2" style="margin-bottom:4px">SIGN YOUR NDA</div>
+      <div class="body" style="margin-bottom:20px">Urban Pulse · Neon Records · Required before booking</div>
+
+      <!-- Stepper -->
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:20px">
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+      </div>
+
+      <!-- NDA doc -->
+      <div class="nda-doc">
+        <div class="nda-header">
+          <div class="nda-icon">📄</div>
+          <div>
+            <div class="nda-title">Non-Disclosure Agreement</div>
+            <div class="nda-sub">Neon Records × Urban Pulse · 2 pages</div>
+          </div>
+        </div>
+        <div class="nda-body">
+          This Non-Disclosure Agreement ("Agreement") is entered into as of April 11, 2026, between Neon Records LLC ("Client") and John Smith ("Crew Member").<br><br>
+          The Crew Member agrees to keep all production details, creative direction, and client information strictly confidential during and after the production period ending April 30, 2026.<br><br>
+          This includes but is not limited to: shoot locations, unreleased music, artist involvement, and production budget.
+        </div>
+
+        <!-- Signature box - unsigned -->
+        <div class="label" style="margin-bottom:8px">Your Signature</div>
+        <div class="nda-sig-box" onclick="show(6, document.querySelectorAll('.nav-btn')[6])">
+          <div style="font-size:24px;margin-bottom:6px">✍️</div>
+          <div style="font-size:13px;font-weight:600;color:var(--muted)">Tap to sign</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Draw or type your signature</div>
+        </div>
+      </div>
+
+      <!-- Rate locked confirmation -->
+      <div class="card">
+        <div class="info-row">
+          <div class="info-key">Agreed Rate</div>
+          <div class="info-val" style="color:var(--orange)">$850 / day</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Total (5 days)</div>
+          <div class="info-val">$4,250</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Payment via</div>
+          <div class="info-val">Visianary Payout</div>
+        </div>
+      </div>
+
+      <button class="btn btn-orange" onclick="show(6, document.querySelectorAll('.nav-btn')[6])">Sign & Confirm →</button>
+      <div style="height:8px"></div>
+      <div class="body" style="text-align:center">By signing you agree to the terms above and the Visianary <span style="color:var(--orange);font-weight:600">Terms of Service</span>.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 7 — YOU'RE BOOKED!
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s6">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <div class="logo">visianary</div>
+    <div class="avatar-circle">JS</div>
+  </div>
+  <div class="phone-content">
+    <!-- Big celebration header -->
+    <div style="background:var(--orange);padding:32px 20px 28px;text-align:center">
+      <div style="font-size:56px;margin-bottom:12px">🎬</div>
+      <div class="display" style="font-size:32px;color:#fff;margin-bottom:6px">YOU'RE BOOKED!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.85)">NDA signed · Rate locked in · You're on the crew.</div>
+    </div>
+
+    <div class="section-pad">
+      <!-- Confirmation card -->
+      <div class="card" style="border-color:rgba(242,92,5,0.2)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="h3">Urban Pulse</div>
+          <div class="badge badge-confirmed">CONFIRMED</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">📅 Dates</div>
+          <div class="info-val">Apr 14–18, 2026</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">📍 Location</div>
+          <div class="info-val">Downtown LA</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">🎚️ Role</div>
+          <div class="info-val">Gaffer</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">💰 Rate</div>
+          <div class="info-val" style="color:var(--orange)">$850/day · $4,250 total</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Producer</div>
+          <div class="info-val">Linda Kim</div>
+        </div>
+      </div>
+
+      <!-- What's next -->
+      <div class="alert-banner alert-teal">
+        <div class="alert-icon">📋</div>
+        <div class="alert-text"><strong>Call Sheet incoming</strong> · Linda will send the full call sheet 24–48 hrs before the shoot. Keep an eye on your SMS.</div>
+      </div>
+
+      <div class="alert-banner alert-yellow">
+        <div class="alert-icon">💳</div>
+        <div class="alert-text"><strong>Set up payout</strong> · Add your bank or payment info to receive $4,250 after the shoot.</div>
+      </div>
+
+      <!-- Action buttons -->
+      <button class="btn btn-orange" onclick="show(7, document.querySelectorAll('.nav-btn')[7])">View in My Gigs →</button>
+      <div style="height:10px"></div>
+      <button class="btn btn-ghost">Set Up Payout</button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><div class="nav-icon">📁</div>Portfolio</div>
+    <div class="nav-item active"><div class="nav-icon">💼</div>My Gigs</div>
+    <div class="nav-item"><div class="nav-icon">💰</div>Payout</div>
+    <div class="nav-item"><div class="nav-icon">💬</div>Messages</div>
+    <div class="nav-item"><div class="nav-icon">⚙️</div>Settings</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 8 — MY GIGS LIST
+     ══════════════════════════════════════════════ -->
+<div class="screen" id="s7">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="app-header">
+    <div class="logo">visianary</div>
+    <div class="avatar-circle">JS</div>
+  </div>
+  <div class="phone-content">
+    <div class="section-pad">
+      <div class="display h1" style="margin-bottom:4px">MY GIGS</div>
+      <div class="body" style="margin-bottom:20px">John Smith · Gaffer</div>
+
+      <!-- Upcoming -->
+      <div class="label" style="margin-bottom:10px">Upcoming</div>
+
+      <!-- NEW — Urban Pulse card (highlighted) -->
+      <div class="gig-card" style="border-color:rgba(0,154,132,0.25);background:rgba(0,154,132,0.03)">
+        <div class="gig-color-bar" style="background:var(--teal)"></div>
+        <div class="gig-info">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div class="gig-title">Urban Pulse</div>
+            <div class="badge badge-confirmed">CONFIRMED</div>
+            <div style="font-size:10px;font-weight:700;color:var(--teal);background:rgba(0,154,132,0.1);padding:2px 6px;border-radius:4px">NEW</div>
+          </div>
+          <div class="gig-meta">Music Video · Apr 14–18 · Downtown LA</div>
+          <div class="gig-footer">
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:20px;height:20px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:800">LK</div>
+              <span style="font-size:11px;color:var(--muted)">Linda Kim</span>
+            </div>
+            <div class="gig-rate" style="color:var(--orange)">$850/day</div>
+          </div>
+          <div style="margin-top:10px">
+            <button class="btn btn-teal btn-sm" style="width:auto;padding:7px 14px">View Call Sheet</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past gig 1 -->
+      <div class="label" style="margin:16px 0 10px">Past</div>
+      <div class="gig-card">
+        <div class="gig-color-bar" style="background:var(--muted)"></div>
+        <div class="gig-info">
+          <div class="gig-title">Baddies West S3</div>
+          <div class="gig-meta">Reality TV · Mar 5–14 · Studio City</div>
+          <div class="gig-footer">
+            <div class="badge badge-confirmed">CONFIRMED</div>
+            <div class="gig-rate">$800/day</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gig-card">
+        <div class="gig-color-bar" style="background:var(--muted)"></div>
+        <div class="gig-info">
+          <div class="gig-title">Nike Campaign</div>
+          <div class="gig-meta">Commercial · Feb 20–22 · Venice Beach</div>
+          <div class="gig-footer">
+            <div class="badge" style="background:rgba(226,75,74,0.08);color:var(--red)">DECLINED</div>
+            <div class="gig-rate" style="color:var(--muted)">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile CTA at bottom -->
+      <div class="alert-banner alert-orange" style="margin-top:8px">
+        <div class="alert-icon">👤</div>
+        <div class="alert-text"><strong>Profile 20% complete.</strong> Add a photo and bio to get discovered by more producers. <span style="color:var(--orange);font-weight:700">Complete now →</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item"><div class="nav-icon">📁</div>Portfolio</div>
+    <div class="nav-item active"><div class="nav-icon">💼</div>My Gigs</div>
+    <div class="nav-item"><div class="nav-icon">💰</div>Payout</div>
+    <div class="nav-item"><div class="nav-icon">💬</div>Messages</div>
+    <div class="nav-item"><div class="nav-icon">⚙️</div>Settings</div>
+  </div>
+</div>
+</div>
+
+<script>
+function show(i, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s' + i).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+// URL ?screen=N support
+(function() {
+  const p = new URLSearchParams(window.location.search).get('screen');
+  if (p !== null) {
+    const idx = Math.min(Math.max(parseInt(p)||0, 0), 7);
+    show(idx, document.querySelectorAll('.nav-btn')[idx]);
+  }
+})();
+</script>
+</body>
+</html>
